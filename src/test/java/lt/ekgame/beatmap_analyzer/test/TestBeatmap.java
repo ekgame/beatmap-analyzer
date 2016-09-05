@@ -20,7 +20,7 @@ public class TestBeatmap {
 	@Test
 	public void test() throws FileNotFoundException, BeatmapException {
 		BeatmapParser parser = new BeatmapParser();
-		Beatmap beatmap = parser.parse(new File("beatmap2.osu")).applyMods(new Mods(Mod.HIDDEN, Mod.HARDROCK));
+		Beatmap beatmap = parser.parse(new File("blue_zenith.osu")).applyMods(new Mods(Mod.HARDROCK));
 		System.out.println(beatmap.getMaxCombo());
 		
 		Difficulty diff = beatmap.getDifficulty();
@@ -28,19 +28,12 @@ public class TestBeatmap {
 		System.out.println("aim:   " + diff.getAimDifficulty());
 		System.out.println("speed: " + diff.getSpeedDifficulty());
 		
-		Performance perf = beatmap.getPerformance(1);
+		Performance perf = beatmap.getPerformance(2358, 0.9971, 1);
 		System.out.println("\nacc:      " + perf.getAccuracy());
 		System.out.println("aim_pp:   " + perf.getAimPerformance());
 		System.out.println("speed_pp: " + perf.getSpeedPerformance());
 		System.out.println("acc_pp:   " + perf.getAccuracyPerformance());
 		System.out.println("total_pp: " + perf.getPerformance());
-		
-		Performance perf2 = beatmap.getPerformance(0, 0);
-		System.out.println("\nacc:      " + perf2.getAccuracy());
-		System.out.println("aim_pp:   " + perf2.getAimPerformance());
-		System.out.println("speed_pp: " + perf2.getSpeedPerformance());
-		System.out.println("acc_pp:   " + perf2.getAccuracyPerformance());
-		System.out.println("total_pp: " + perf2.getPerformance());
 	}
 	
 	//@Test

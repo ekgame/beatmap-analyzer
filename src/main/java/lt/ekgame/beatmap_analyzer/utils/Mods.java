@@ -2,7 +2,9 @@ package lt.ekgame.beatmap_analyzer.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Mods {
 	
@@ -11,11 +13,13 @@ public class Mods {
 	private final int speedChangingFlags = Mod.DOUBLE_TIME.getBit() | Mod.NIGHTCORE.getBit() | Mod.HALF_TIME.getBit();
 	private final int mapChangingFlags = speedChangingFlags | Mod.EASY.getBit() | Mod.HARDROCK.getBit();
 	
-	private List<Mod> mods;
+	private List<Mod> mods = new ArrayList<>();
 	private int modFlags;
 	
 	public Mods(List<Mod> mods) {
-		this.mods = mods;
+		for (Mod mod : mods)
+			if (!this.mods.contains(mod))
+				this.mods.add(mod);
 		calculateFlags();
 	}
 	
@@ -36,6 +40,15 @@ public class Mods {
         		result.add(mod);
         }
         return new Mods(result);
+	}
+	
+	public List<Mod> getMods() {
+		return Collections.unmodifiableList(mods);
+	}
+	
+	public String toString() {
+		return mods.stream().map(o->o.getShortName())
+			.collect(Collectors.joining()).toUpperCase();
 	}
 	
 	public boolean isNomod() {

@@ -15,6 +15,7 @@ import lt.ekgame.beatmap_analyzer.calculator.Difficulty;
 import lt.ekgame.beatmap_analyzer.calculator.DifficultyCalculator;
 import lt.ekgame.beatmap_analyzer.calculator.Performance;
 import lt.ekgame.beatmap_analyzer.calculator.PerformanceCalculator;
+import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
 import lt.ekgame.beatmap_analyzer.utils.MathUtils;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
@@ -209,6 +210,8 @@ public class Beatmap {
 				}
 			}
 		}
+		
+		BeatmapParser.calculateSliderEnds(hitObjects, timingPoints, difficulties.getSliderMultiplier(), difficulties.getTickRate());
 		
 		return new Beatmap(generals, editorState, metadata, difficulties, breaks, hitObjects, timingPoints, mods);
 	}

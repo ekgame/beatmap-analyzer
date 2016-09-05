@@ -27,18 +27,16 @@ public class PerformanceCalculator {
 		
 		accuracy = Math.max(0.0, Math.min(calculateAccuracy(max300, 0, 0, misses) * 100, accuracy));
 		int num50 = 0;
-		int num100 = (int) Math.round(-3*((accuracy - 1)*beatmap.getHitObjects().size() + misses)*0.5);
+		int num100 = (int)Math.round(-3*((accuracy - 1)* beatmap.getHitObjects().size() + misses)*0.5);
 		
 		if (num100 > beatmap.getHitObjects().size() - misses) {
 			num100 = 0;
-			num50 = (int) Math.round(-6.0 * ((accuracy - 1) * beatmap.getHitObjects().size() + misses) * 0.2);
+			num50 = (int) Math.round(-6.0*((accuracy - 1)*beatmap.getHitObjects().size() + misses)*0.2);
 			num50 = Math.min(max300, num50);
 		}
 		else {
 			num100 = Math.min(max300, num100);
 		}
-
-		//int num300 = beatmap.getHitObjects().size() - num100 - num50 - misses;
 		return calculate(combo, num100, num50, misses, version);
 	}
 	

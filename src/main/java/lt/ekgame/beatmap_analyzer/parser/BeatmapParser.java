@@ -91,7 +91,7 @@ public class BeatmapParser {
 		}
 	}
 	
-	private void calculateSliderEnds(List<HitObject> hitObjects, List<TimingPoint> timingPoints, double sliderVelocity, double tickRate) {
+	public static void calculateSliderEnds(List<HitObject> hitObjects, List<TimingPoint> timingPoints, double sliderVelocity, double tickRate) {
 		ListIterator<TimingPoint> timingIterator = timingPoints.listIterator();
 		ListIterator<Slider> objectIterator = hitObjects.stream()
 				.filter(o->o instanceof Slider)
