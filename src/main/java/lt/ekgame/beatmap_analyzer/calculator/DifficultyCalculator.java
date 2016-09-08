@@ -78,7 +78,7 @@ public class DifficultyCalculator {
 		}
 		
 		double difficulty = 0, weight = 1;
-		Collections.sort(highestStrains, (a,b)->(int)(b*100-a*100));
+		Collections.sort(highestStrains, (a,b)->(int)(Math.signum(b-a)));
 		
 		for (double strain : highestStrains) {
 			difficulty += weight*strain;

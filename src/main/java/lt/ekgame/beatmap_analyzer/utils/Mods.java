@@ -27,6 +27,14 @@ public class Mods {
 		this(Arrays.asList(mods));
 	}
 	
+	public static Mods parse(int flags) {
+		List<Mod> result = new ArrayList<>();
+		for (Mod mod : Mod.values())
+			if ((flags & mod.getBit()) > 0)
+				result.add(mod);
+		return new Mods(result);
+	}
+	
 	public static Mods parse(String mods) {
 		List<Mod> result = new ArrayList<Mod>();
         int length = mods.length();
@@ -40,6 +48,16 @@ public class Mods {
         		result.add(mod);
         }
         return new Mods(result);
+	}
+	
+	public boolean isRanked() {
+		return !mods.stream()
+			.filter(mod->!mod.isRanked())
+			.findAny().isPresent();
+	}
+	
+	public Mods withoutUnranked() {
+		return new Mods(mods.stream().filter(mod->mod.isRanked()).collect(Collectors.toList()));
 	}
 	
 	public List<Mod> getMods() {
