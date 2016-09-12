@@ -17,24 +17,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import lt.ekgame.beatmap_analyzer.Beatmap;
 import lt.ekgame.beatmap_analyzer.Gamemode;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapDifficulties;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapEditorState;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapGenerals;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapMetadata;
-import lt.ekgame.beatmap_analyzer.beatmap.BreakPeriod;
-import lt.ekgame.beatmap_analyzer.beatmap.TimingPoint;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.HitCircle;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.HitObject;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.Slider;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.Spinner;
-import lt.ekgame.beatmap_analyzer.utils.Vec2;
+import lt.ekgame.beatmap_analyzer.beatmap.*;
+import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSlider;
+import lt.ekgame.beatmap_analyzer.parser.hitobjects.*;
 
 public class BeatmapParser {
 	
 	private static final Pattern PART_TAG = Pattern.compile("^\\[(\\w+)\\]");
 	private static final String[] REQUIRED_TAGS = {"General", "Metadata", "TimingPoints", "Difficulty", "Events", "HitObjects"};
+	
+	private static final Map<Gamemode, HitObjectParser> PARSERS = new HashMap<>();
+	
+	static {
+		PARSERS.put(Gamemode.OSU,   new OsuParser());
+		PARSERS.put(Gamemode.TAIKO, new TaikoParser());
+		PARSERS.put(Gamemode.CATCH, new CatchParser());
+		PARSERS.put(Gamemode.MANIA, new ManiaParser());
+	}
 	
 	public Beatmap parse(File file) throws FileNotFoundException, BeatmapException {
 		return parse(new FileInputStream(file));
@@ -69,8 +69,9 @@ public class BeatmapParser {
 					throw new BeatmapException("Couldn't find required \"" + reqiredTag + "\" tag found.");
 			
 			BeatmapGenerals generalSettings = new BeatmapGenerals(parts.get("General"));
+			HitObjectParser parser = PARSERS.get(generalSettings.getGamemode());
 			// TODO: parse other gamemodes
-			if (generalSettings.getGamemode() != Gamemode.OSU)
+			if (parser == null)
 				return null;
 			
 			BeatmapMetadata metadata = new BeatmapMetadata(parts.get("Metadata"));
@@ -83,7 +84,7 @@ public class BeatmapParser {
 			
 			List<BreakPeriod> breaks = parseBreaks(parts.get("Events"));
 			List<TimingPoint> timingPoints = parseTimePoints(parts.get("TimingPoints"));
-			List<HitObject> hitObjects = parseHitObjects(parts.get("HitObjects"));
+			List<HitObject> hitObjects = parseHitObjects(parts.get("HitObjects"), parser);
 			
 			calculateSliderEnds(hitObjects, timingPoints, difficulties.getSliderMultiplier(), difficulties.getTickRate());
 			
@@ -93,9 +94,9 @@ public class BeatmapParser {
 	
 	public static void calculateSliderEnds(List<HitObject> hitObjects, List<TimingPoint> timingPoints, double sliderVelocity, double tickRate) {
 		ListIterator<TimingPoint> timingIterator = timingPoints.listIterator();
-		ListIterator<Slider> objectIterator = hitObjects.stream()
-				.filter(o->o instanceof Slider)
-				.map(o->(Slider)o)
+		ListIterator<OsuSlider> objectIterator = hitObjects.stream()
+				.filter(o->o instanceof OsuSlider)
+				.map(o->(OsuSlider)o)
 				.collect(Collectors.toList())
 				.listIterator();
 		
@@ -110,7 +111,7 @@ public class BeatmapParser {
 			if (!previous.isInherited()) parent = previous;
 			
 			while (objectIterator.hasNext()) {
-				Slider slider = objectIterator.next();
+				OsuSlider slider = objectIterator.next();
 				if (current == null || slider.getStartTime() < current.getTimestamp()) {
 					slider.calculate(previous, parent, sliderVelocity, tickRate);
 				}
@@ -173,49 +174,9 @@ public class BeatmapParser {
 			.collect(Collectors.toList());
 	}
 	
-	private static Function<String, HitObject> hitObjectMapper = line -> {
-		String[] args = line.split(",");
-		Vec2 position = new Vec2(
-			Integer.parseInt(args[0].trim()),
-			Integer.parseInt(args[1].trim())
-		);
-		int time = Integer.parseInt(args[2].trim());
-		int type = Integer.parseInt(args[3].trim());
-		int hitSound = Integer.parseInt(args[4].trim());
-		boolean newCombo = (type & 4) > 0;
-		
-		if ((type & 1) > 0) {
-			return new HitCircle(position, time, hitSound, newCombo);
-		}
-		else if ((type & 2) > 0) {
-			String[] sliderData = args[5].trim().split("\\|");
-			
-			char sliderTypeChar = sliderData[0].charAt(0);
-			Slider.SliderType sliderType = Slider.SliderType.fromChar(sliderTypeChar);
-			
-			List<Vec2> sliderPoints = new ArrayList<>();
-			
-			for (int i = 1; i < sliderData.length; i++) {
-				String[] pointData = sliderData[i].split(":");
-				sliderPoints.add(new Vec2(
-					Integer.parseInt(pointData[0]),
-					Integer.parseInt(pointData[1])
-				));
-			}
-			int repetitions = Integer.parseInt(args[6].trim());
-			double pixelLength = Double.parseDouble(args[7].trim());
-			
-			return new Slider(position, time, hitSound, newCombo, sliderType, sliderPoints, repetitions, pixelLength);
-		}
-		else {
-			int endTime = Integer.parseInt(args[5].trim());
-			return new Spinner(position, time, endTime, hitSound, newCombo);
-		}
-	};
-	
-	private List<HitObject> parseHitObjects(FilePart part) {
+	private List<HitObject> parseHitObjects(FilePart part, HitObjectParser parser) {
 		return part.getLines().stream()
-			.map(hitObjectMapper)
+			.map(parser::parse)
 			.sorted((o1, o2) -> (int)(o1.getStartTime() - o2.getStartTime()))
 			.collect(Collectors.toList());
 	}

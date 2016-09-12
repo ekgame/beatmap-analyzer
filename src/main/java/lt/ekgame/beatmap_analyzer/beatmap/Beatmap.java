@@ -1,16 +1,10 @@
-package lt.ekgame.beatmap_analyzer;
+package lt.ekgame.beatmap_analyzer.beatmap;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapDifficulties;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapEditorState;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapGenerals;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapMetadata;
-import lt.ekgame.beatmap_analyzer.beatmap.BreakPeriod;
-import lt.ekgame.beatmap_analyzer.beatmap.TimingPoint;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.HitObject;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.Slider;
+import lt.ekgame.beatmap_analyzer.Gamemode;
+import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSlider;
 import lt.ekgame.beatmap_analyzer.calculator.Difficulty;
 import lt.ekgame.beatmap_analyzer.calculator.DifficultyCalculator;
 import lt.ekgame.beatmap_analyzer.calculator.Performance;
@@ -48,6 +42,7 @@ public class Beatmap {
 	private Difficulty difficulty = null;
 	private PerformanceCalculator performanceCalculator = null;
 	private Mods mods = Mods.NOMOD;
+	private Gamemode gamemode;
 
 	public Beatmap(BeatmapGenerals generals, BeatmapEditorState editorState,
 		BeatmapMetadata metadata, BeatmapDifficulties difficulties,
@@ -103,7 +98,7 @@ public class Beatmap {
 	public int getMaxCombo() {
 		if (maxCombo < 0)
 			maxCombo = hitObjects.stream()
-				.mapToInt(o->(o instanceof Slider) ? ((Slider)o).getCombo() : 1)
+				.mapToInt(o->(o instanceof OsuSlider) ? ((OsuSlider)o).getCombo() : 1)
 				.sum();
 		return maxCombo;
 	}
@@ -142,7 +137,7 @@ public class Beatmap {
 		return timingPoints;
 	}
 	
-	public Beatmap applyMods(Mods mods) {
+	public Beatmap withMods(Mods mods) {
 		if (!this.mods.isNomod())
 			throw new IllegalStateException("This beatmap already has mods applied to it.");
 		

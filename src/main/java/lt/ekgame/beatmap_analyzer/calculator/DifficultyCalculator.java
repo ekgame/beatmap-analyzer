@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lt.ekgame.beatmap_analyzer.Beatmap;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.HitObject;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.Spinner;
+import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
+import lt.ekgame.beatmap_analyzer.beatmap.HitObject;
+import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSpinner;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
 public class DifficultyCalculator {
@@ -116,7 +116,7 @@ public class DifficultyCalculator {
 			double decay = Math.pow(DECAY_BASE[difficultyType], timeElapsed/1000f);
 			double scaling = WEIGHT_SCALING[difficultyType];
 			
-			if (!(object instanceof Spinner)) {
+			if (!(object instanceof OsuSpinner)) {
 				double distance = normStart.distance(previous.normStart);
 				res = spacingWeight(distance, difficultyType)*scaling;
 			}

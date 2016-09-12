@@ -1,4 +1,4 @@
-package lt.ekgame.beatmap_analyzer.beatmap.osu;
+package lt.ekgame.beatmap_analyzer.beatmap;
 
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 

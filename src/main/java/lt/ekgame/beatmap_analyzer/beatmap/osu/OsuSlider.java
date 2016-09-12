@@ -3,10 +3,11 @@ package lt.ekgame.beatmap_analyzer.beatmap.osu;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lt.ekgame.beatmap_analyzer.beatmap.HitObject;
 import lt.ekgame.beatmap_analyzer.beatmap.TimingPoint;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
-public class Slider extends HitObject {
+public class OsuSlider extends OsuObject {
 	
 	private SliderType sliderType;
 	private List<Vec2> sliderPoints;
@@ -14,7 +15,7 @@ public class Slider extends HitObject {
 	private double pixelLength;
 	private int combo;
 
-	public Slider(Vec2 position, int startTime, int hitSound, boolean isNewCombo, SliderType sliderType, List<Vec2> sliderPoints, int repetitions, double pixelLength) {
+	public OsuSlider(Vec2 position, int startTime, int hitSound, boolean isNewCombo, SliderType sliderType, List<Vec2> sliderPoints, int repetitions, double pixelLength) {
 		super(position, startTime, startTime, hitSound, isNewCombo);
 		this.sliderType = sliderType;
 		this.sliderPoints = sliderPoints;
@@ -24,7 +25,7 @@ public class Slider extends HitObject {
 	
 	@Override
 	public HitObject clone() {
-		return new Slider(position.clone(), startTime, hitSound, isNewCombo, sliderType, cloneSliderPoints(), repetitions, pixelLength);
+		return new OsuSlider(position.clone(), startTime, hitSound, isNewCombo, sliderType, cloneSliderPoints(), repetitions, pixelLength);
 	}
 	
 	private List<Vec2> cloneSliderPoints() {
