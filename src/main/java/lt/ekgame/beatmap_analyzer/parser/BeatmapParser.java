@@ -27,13 +27,13 @@ public class BeatmapParser {
 	private static final Pattern PART_TAG = Pattern.compile("^\\[(\\w+)\\]");
 	private static final String[] REQUIRED_TAGS = {"General", "Metadata", "TimingPoints", "Difficulty", "Events", "HitObjects"};
 	
-	private static final Map<Gamemode, HitObjectParser> PARSERS = new HashMap<>();
+	private static final Map<Gamemode, HitObjectParser<?>> PARSERS = new HashMap<>();
 	
 	static {
 		PARSERS.put(Gamemode.OSU,   new OsuParser());
-		PARSERS.put(Gamemode.TAIKO, new TaikoParser());
-		PARSERS.put(Gamemode.CATCH, new CatchParser());
-		PARSERS.put(Gamemode.MANIA, new ManiaParser());
+		//PARSERS.put(Gamemode.TAIKO, new TaikoParser());
+		//PARSERS.put(Gamemode.CATCH, new CatchParser());
+		//PARSERS.put(Gamemode.MANIA, new ManiaParser());
 	}
 	
 	public Beatmap parse(File file) throws FileNotFoundException, BeatmapException {
@@ -69,7 +69,7 @@ public class BeatmapParser {
 					throw new BeatmapException("Couldn't find required \"" + reqiredTag + "\" tag found.");
 			
 			BeatmapGenerals generalSettings = new BeatmapGenerals(parts.get("General"));
-			HitObjectParser parser = PARSERS.get(generalSettings.getGamemode());
+			HitObjectParser<?> parser = PARSERS.get(generalSettings.getGamemode());
 			// TODO: parse other gamemodes
 			if (parser == null)
 				return null;
