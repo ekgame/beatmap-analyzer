@@ -3,7 +3,7 @@ package lt.ekgame.beatmap_analyzer.beatmap.osu;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lt.ekgame.beatmap_analyzer.beatmap.HitObject;
+import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.TimingPoint;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
@@ -24,27 +24,33 @@ public class OsuSlider extends OsuObject {
 	}
 	
 	@Override
-	public HitObject clone() {
+	public OsuObject clone() {
 		return new OsuSlider(position.clone(), startTime, hitSound, isNewCombo, sliderType, cloneSliderPoints(), repetitions, pixelLength);
 	}
 	
-	private List<Vec2> cloneSliderPoints() {
-		return sliderPoints.stream().map(o->o.clone()).collect(Collectors.toList());
-	}
-	
-	public void calculate(TimingPoint current, TimingPoint parent, double sliderVelocity, double tickRate) {
+	@Override
+	public void finalize(TimingPoint current, TimingPoint parent, Beatmap beatmap) {
 		double velocityMultiplier = 1;
 		if (current.isInherited() && current.getBeatLength() < 0)
 			velocityMultiplier = -100/current.getBeatLength();
 		
-		double pixelsPerBeat = sliderVelocity*100*velocityMultiplier;
+		double pixelsPerBeat = beatmap.getDifficultySettings().getSliderMultiplier()*100*velocityMultiplier;
 		double beats = pixelLength*repetitions/pixelsPerBeat;
 		int duration = (int) Math.ceil(beats*parent.getBeatLength());
 		endTime = startTime + duration;
 		
-		combo = (int)Math.ceil((beats - 0.01)/repetitions*tickRate) - 1;
+		combo = (int)Math.ceil((beats - 0.01)/repetitions*beatmap.getDifficultySettings().getTickRate()) - 1;
 		combo *= repetitions;
 		combo += repetitions + 1; // head and tail
+	}
+	
+	@Override
+	public int getCombo() {
+		return combo;
+	}
+	
+	private List<Vec2> cloneSliderPoints() {
+		return sliderPoints.stream().map(o->o.clone()).collect(Collectors.toList());
 	}
 	
 	public SliderType getSliderType() {
@@ -57,10 +63,6 @@ public class OsuSlider extends OsuObject {
 
 	public int getRepetitions() {
 		return repetitions;
-	}
-	
-	public int getCombo() {
-		return combo;
 	}
 
 	public double getPixelLength() {

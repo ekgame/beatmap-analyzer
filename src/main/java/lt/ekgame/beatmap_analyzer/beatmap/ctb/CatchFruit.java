@@ -1,6 +1,5 @@
 package lt.ekgame.beatmap_analyzer.beatmap.ctb;
 
-import lt.ekgame.beatmap_analyzer.beatmap.HitObject;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
 public class CatchFruit extends CatchObject {
@@ -10,7 +9,7 @@ public class CatchFruit extends CatchObject {
 	}
 
 	@Override
-	public HitObject clone() {
+	public CatchObject clone() {
 		return new CatchFruit(position.clone(), startTime, hitSound, isNewCombo);
 	}
 }

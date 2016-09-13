@@ -1,6 +1,5 @@
 package lt.ekgame.beatmap_analyzer.beatmap.osu;
 
-import lt.ekgame.beatmap_analyzer.beatmap.HitObject;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
 public class OsuSpinner extends OsuObject {
@@ -10,7 +9,7 @@ public class OsuSpinner extends OsuObject {
 	}
 
 	@Override
-	public HitObject clone() {
+	public OsuObject clone() {
 		return new OsuSpinner(position.clone(), startTime, endTime, hitSound, isNewCombo);
 	}
 }

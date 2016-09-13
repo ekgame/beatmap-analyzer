@@ -1,17 +1,18 @@
-package lt.ekgame.beatmap_analyzer.calculator;
+package lt.ekgame.beatmap_analyzer.difficulty;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.HitObject;
+import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
+import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuObject;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSpinner;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
-public class DifficultyCalculator {
-	
+public class OsuDifficultyCalculator implements DifficultyCalculator {
+
 	private static final double DECAY_BASE[] = {0.3, 0.15};
 	private static final double WEIGHT_SCALING[] = {1400, 26.25};
 	private static final double STAR_SCALING_FACTOR = 0.0675;
@@ -32,7 +33,7 @@ public class DifficultyCalculator {
 	
 	private List<DifficultyObject> difficultyObjects;
 	
-	public DifficultyCalculator(Beatmap beatmap) {
+	public OsuDifficultyCalculator(OsuBeatmap beatmap) {
 		double radius = (PLAYFIELD_WIDTH/16)*(1 - 0.7*(beatmap.getDifficultySettings().getCS() - 5)/5);
 		
 		difficultyObjects = beatmap.getHitObjects().stream()
@@ -47,6 +48,7 @@ public class DifficultyCalculator {
 		}
 	}
 	
+	@Override
 	public Difficulty calculate() {
 		double aimDifficulty = Math.sqrt(calculateDifficulty(DIFF_AIM))*STAR_SCALING_FACTOR;
 		double speedDifficulty = Math.sqrt(calculateDifficulty(DIFF_SPEED))*STAR_SCALING_FACTOR;
@@ -60,7 +62,7 @@ public class DifficultyCalculator {
 	
 	private double calculateDifficulty(byte difficultyType) {
 		List<Double> highestStrains = new ArrayList<>();
-		long intervalEnd = STRAIN_STEP;
+		double intervalEnd = STRAIN_STEP;
 		double maxStrain = 0;
 		
 		DifficultyObject previous = null;
@@ -90,11 +92,11 @@ public class DifficultyCalculator {
 
 	class DifficultyObject {
 		
-		private HitObject object;
+		private OsuObject object;
 		private double[] strains = {1, 1};
 		private Vec2 normStart;//, normEnd;
 		
-		DifficultyObject(HitObject object, double radius) {
+		DifficultyObject(OsuObject object, double radius) {
 			this.object = object;
 			
 			double scalingFactor = 52/radius;

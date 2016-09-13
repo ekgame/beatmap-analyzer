@@ -1,21 +1,17 @@
 package lt.ekgame.beatmap_analyzer.beatmap;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ListIterator;
 
 import lt.ekgame.beatmap_analyzer.Gamemode;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSlider;
-import lt.ekgame.beatmap_analyzer.calculator.Difficulty;
-import lt.ekgame.beatmap_analyzer.calculator.DifficultyCalculator;
-import lt.ekgame.beatmap_analyzer.calculator.Performance;
-import lt.ekgame.beatmap_analyzer.calculator.PerformanceCalculator;
-import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
+import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
+import lt.ekgame.beatmap_analyzer.performance.Performance;
+import lt.ekgame.beatmap_analyzer.performance.PerformanceCalculator;
 import lt.ekgame.beatmap_analyzer.utils.MathUtils;
-import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 import lt.ekgame.beatmap_analyzer.utils.ScoreVersion;
 
-public class Beatmap {
+public abstract class Beatmap {
 	
 	private final double 
 		ODMinMs = 79.5, // OD 0
@@ -29,47 +25,63 @@ public class Beatmap {
 		ARStepLow = 120,  // AR 0-5
 		ARStepHigh = 150; // AR 5-10
 	
-	private BeatmapGenerals generals;
-	private BeatmapEditorState editorState;
-	private BeatmapMetadata metadata;
-	private BeatmapDifficulties difficulties;
+	protected BeatmapGenerals generals;
+	protected BeatmapEditorState editorState;
+	protected BeatmapMetadata metadata;
+	protected BeatmapDifficulties difficulties;
 	
-	private List<BreakPeriod> breaks;
-	private List<HitObject> hitObjects;
-	private List<TimingPoint> timingPoints;
+	protected List<BreakPeriod> breaks;
+	protected List<TimingPoint> timingPoints;
 	
-	private int maxCombo = -1;
-	private Difficulty difficulty = null;
-	private PerformanceCalculator performanceCalculator = null;
-	private Mods mods = Mods.NOMOD;
-	private Gamemode gamemode;
-
-	public Beatmap(BeatmapGenerals generals, BeatmapEditorState editorState,
+	protected Mods mods = Mods.NOMOD;
+	
+	protected Beatmap(BeatmapGenerals generals, BeatmapEditorState editorState,
 		BeatmapMetadata metadata, BeatmapDifficulties difficulties,
-		List<BreakPeriod> breaks, List<HitObject> hitObjects, List<TimingPoint> timingPoints) 
+		List<BreakPeriod> breaks, List<TimingPoint> timingPoints, Mods mods) 
 	{
 		this.generals = generals;
 		this.editorState = editorState;
 		this.metadata = metadata;
 		this.difficulties = difficulties;
 		this.breaks = breaks;
-		this.hitObjects = hitObjects;
 		this.timingPoints = timingPoints;
-	}
-	
-	public Beatmap(BeatmapGenerals generals, BeatmapEditorState editorState,
-		BeatmapMetadata metadata, BeatmapDifficulties difficulties,
-		List<BreakPeriod> breaks, List<HitObject> hitObjects, List<TimingPoint> timingPoints, Mods mods) 
-	{
-		this(generals, editorState, metadata, difficulties, breaks, hitObjects, timingPoints);
 		this.mods = mods;
 	}
 	
-	public PerformanceCalculator getPerformanceCalculator() {
-		if (performanceCalculator == null)
-			performanceCalculator = new PerformanceCalculator(this);
-		return performanceCalculator;
+	protected void finalizeObjects(List<? extends HitObject> objects) {
+		ListIterator<TimingPoint> timingIterator = timingPoints.listIterator();
+		ListIterator<? extends HitObject> objectIterator = objects.listIterator();
+		
+		// find first parent point
+		TimingPoint parent = null;
+		while (parent == null || parent.isInherited())
+			parent = timingIterator.next();
+		
+		while (true) {
+			TimingPoint current = timingIterator.hasNext() ? timingIterator.next() : null;
+			TimingPoint previous = timingPoints.get(timingIterator.previousIndex() - (current == null ? 0 : 1));
+			if (!previous.isInherited()) parent = previous;
+			
+			while (objectIterator.hasNext()) {
+				HitObject object = objectIterator.next();
+				if (current == null || object.getStartTime() < current.getTimestamp()) {
+					object.finalize(previous, parent, this);
+				}
+				else {
+					objectIterator.previous();
+					break;
+				}	
+			}
+			
+			if (current == null) break;
+		}
 	}
+	
+	public abstract Gamemode getGamemode();
+	
+	public abstract Difficulty getDifficulty();
+	
+	public abstract PerformanceCalculator getPerformanceCalculator();
 	
 	public Performance getPerformance(int combo, double accuracy, int misses) {
 		return getPerformanceCalculator().calculate(combo, accuracy, misses, ScoreVersion.VERSION_1);
@@ -95,19 +107,7 @@ public class Beatmap {
 		return mods;
 	}
 	
-	public int getMaxCombo() {
-		if (maxCombo < 0)
-			maxCombo = hitObjects.stream()
-				.mapToInt(o->(o instanceof OsuSlider) ? ((OsuSlider)o).getCombo() : 1)
-				.sum();
-		return maxCombo;
-	}
-	
-	public Difficulty getDifficulty() {
-		if (difficulty == null)
-			difficulty = new DifficultyCalculator(this).calculate();
-		return difficulty;
-	}
+	public abstract int getMaxCombo();
 
 	public BeatmapGenerals getGenerals() {
 		return generals;
@@ -128,86 +128,50 @@ public class Beatmap {
 	public List<BreakPeriod> getBreaks() {
 		return breaks;
 	}
-
-	public List<HitObject> getHitObjects() {
-		return hitObjects;
-	}
 	
 	public List<TimingPoint> getTimingPoints() {
 		return timingPoints;
 	}
 	
-	public Beatmap withMods(Mods mods) {
-		if (!this.mods.isNomod())
-			throw new IllegalStateException("This beatmap already has mods applied to it.");
-		
-		BeatmapGenerals generals = this.generals.clone();
-		BeatmapEditorState editorState = this.editorState.clone();
-		BeatmapMetadata metadata = this.metadata.clone();
-		BeatmapDifficulties difficulties = this.difficulties.clone();
-		
-		List<HitObject> hitObjects = this.hitObjects.stream()
-			.map(o->o.clone()).collect(Collectors.toList());
-		List<BreakPeriod> breaks = this.breaks.stream()
-			.map(o->o.clone()).collect(Collectors.toList());
-		List<TimingPoint> timingPoints = this.timingPoints.stream()
-			.map(o->o.clone()).collect(Collectors.toList());
-		
-		if (mods.isMapChanging()) {
-			double speedMultiplier = 1;
-			if (mods.has(Mod.DOUBLE_TIME) || mods.has(Mod.NIGHTCORE)) speedMultiplier *= 1.5;
-			if (mods.has(Mod.HALF_TIME)) speedMultiplier *= 0.75;
-			
-			double odMultiplier = 1;
-			if (mods.has(Mod.HARDROCK)) odMultiplier *= 1.4;
-			if (mods.has(Mod.EASY)) odMultiplier *= 0.5;
-			
-			double arMultiplier = 1;
-			if (mods.has(Mod.HARDROCK)) arMultiplier *= 1.4;
-			if (mods.has(Mod.EASY)) arMultiplier *= 0.5;
-			
-			double csMultiplier = 1;
-			if (mods.has(Mod.HARDROCK)) csMultiplier *= 1.3;
-			if (mods.has(Mod.EASY)) csMultiplier *= 0.5;
-			
-			double overallDifficulty = difficulties.getOD()*odMultiplier;
-			double overallDifficultyTime = ODMinMs - Math.ceil(ODStep*overallDifficulty);
-			overallDifficultyTime = MathUtils.clamp(ODMaxMs, ODMinMs, overallDifficultyTime/speedMultiplier);
-			overallDifficulty = (ODMinMs - overallDifficultyTime)/ODStep;
-			
-			double approachRate = difficulties.getAR()*arMultiplier;
-			double approachRateTime = approachRate <= 5 ? (ARMinMs - ARStepLow*approachRate) : (ARMidMs - ARStepHigh*(approachRate - 5));
-			approachRateTime = MathUtils.clamp(ARMaxMs, ARMinMs, approachRateTime/speedMultiplier);
-			approachRate = approachRate <= 5 ? ((ARMinMs - approachRateTime)/ARStepLow) : (5 + (ARMidMs - approachRateTime)/ARStepHigh);
-			
-			double circleSize = difficulties.getCS()*csMultiplier;
-			circleSize = MathUtils.clamp(0, 10, circleSize);
-			
-			difficulties.setAR(approachRate);
-			difficulties.setOD(overallDifficulty);
-			difficulties.setCS(circleSize);
-			
-			if (mods.isSpeedChanging()) {
-				for (HitObject object : hitObjects) {
-					object.setStartTime((int) (object.getStartTime()/speedMultiplier));
-					object.setEndTime((int) (object.getEndTime()/speedMultiplier));
-				}
-				
-				for (TimingPoint point : timingPoints) {
-					point.setTimestamp((int) (point.getTimestamp()/speedMultiplier));
-					if (!point.isInherited())
-						point.setBeatLength(point.getBeatLength()/speedMultiplier);
-				}
-				
-				for (BreakPeriod breakPeriod : breaks) {
-					breakPeriod.setStartTime((int) (breakPeriod.getStartTime()/speedMultiplier));
-					breakPeriod.setEndTime((int) (breakPeriod.getEndTime()/speedMultiplier));
-				}
-			}
+	protected void applySpeedChange(List<? extends HitObject> objects, double speedMultiplier) {
+		for (HitObject object : objects) {
+			object.setStartTime((int) (object.getStartTime()/speedMultiplier));
+			object.setEndTime((int) (object.getEndTime()/speedMultiplier));
 		}
 		
-		BeatmapParser.calculateSliderEnds(hitObjects, timingPoints, difficulties.getSliderMultiplier(), difficulties.getTickRate());
+		for (TimingPoint point : timingPoints) {
+			point.setTimestamp((int) (point.getTimestamp()/speedMultiplier));
+			if (!point.isInherited())
+				point.setBeatLength(point.getBeatLength()/speedMultiplier);
+		}
 		
-		return new Beatmap(generals, editorState, metadata, difficulties, breaks, hitObjects, timingPoints, mods);
+		for (BreakPeriod breakPeriod : breaks) {
+			breakPeriod.setStartTime((int) (breakPeriod.getStartTime()/speedMultiplier));
+			breakPeriod.setEndTime((int) (breakPeriod.getEndTime()/speedMultiplier));
+		}
 	}
+	
+	protected void applyOverallDifficultyChange(double odMultiplier, double speedMultiplier) {
+		double overallDifficulty = difficulties.getOD()*odMultiplier;
+		double overallDifficultyTime = ODMinMs - Math.ceil(ODStep*overallDifficulty);
+		overallDifficultyTime = MathUtils.clamp(ODMaxMs, ODMinMs, overallDifficultyTime/speedMultiplier);
+		overallDifficulty = (ODMinMs - overallDifficultyTime)/ODStep;
+		difficulties.setOD(overallDifficulty);
+	}
+	
+	protected void applyApproachRateChange(double arMultiplier, double speedMultiplier) {
+		double approachRate = difficulties.getAR()*arMultiplier;
+		double approachRateTime = approachRate <= 5 ? (ARMinMs - ARStepLow*approachRate) : (ARMidMs - ARStepHigh*(approachRate - 5));
+		approachRateTime = MathUtils.clamp(ARMaxMs, ARMinMs, approachRateTime/speedMultiplier);
+		approachRate = approachRate <= 5 ? ((ARMinMs - approachRateTime)/ARStepLow) : (5 + (ARMidMs - approachRateTime)/ARStepHigh);
+		difficulties.setAR(approachRate);
+	}
+	
+	protected void applyCircleSizeChange(double csMultiplier) {
+		double circleSize = difficulties.getCS()*csMultiplier;
+		circleSize = MathUtils.clamp(0, 10, circleSize);
+		difficulties.setCS(circleSize);
+	}
+	
+	public abstract Beatmap withMods(Mods mods);
 }

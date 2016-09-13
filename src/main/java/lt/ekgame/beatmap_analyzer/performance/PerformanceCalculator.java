@@ -1,16 +1,17 @@
-package lt.ekgame.beatmap_analyzer.calculator;
+package lt.ekgame.beatmap_analyzer.performance;
 
-import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.BeatmapDifficulties;
+import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuCircle;
+import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.ScoreVersion;
 
 public class PerformanceCalculator {
 	
-	private Beatmap beatmap;
+	private OsuBeatmap beatmap;
 
-	public PerformanceCalculator(Beatmap beatmap) {
+	public PerformanceCalculator(OsuBeatmap beatmap) {
 		this.beatmap = beatmap;
 	}
 	
@@ -91,7 +92,7 @@ public class PerformanceCalculator {
 		double realAccuracy = accuracy;
 		int circles = total;
 		
-		//score v1
+		// score v1
 		if (version == ScoreVersion.VERSION_1) {
 			circles = (int) beatmap.getHitObjects().stream().filter(o->o instanceof OsuCircle).count();
 			if (circles > 0)

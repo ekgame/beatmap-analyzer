@@ -93,4 +93,12 @@ public class Mods {
 	public boolean isSpeedChanging() {
 		return (speedChangingFlags & modFlags) > 0;
 	}
+	
+	public double getTimeRate() {
+		if (has(Mod.DOUBLE_TIME) || has(Mod.NIGHTCORE))
+			return 1.5;
+		else if (has(Mod.HALF_TIME))
+			return 0.75;
+		return 1;
+	}
 }

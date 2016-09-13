@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 
 import lt.ekgame.beatmap_analyzer.Gamemode;
 import lt.ekgame.beatmap_analyzer.beatmap.*;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSlider;
 import lt.ekgame.beatmap_analyzer.parser.hitobjects.*;
 
 public class BeatmapParser {
@@ -31,7 +29,7 @@ public class BeatmapParser {
 	
 	static {
 		PARSERS.put(Gamemode.OSU,   new OsuParser());
-		//PARSERS.put(Gamemode.TAIKO, new TaikoParser());
+		PARSERS.put(Gamemode.TAIKO, new TaikoParser());
 		//PARSERS.put(Gamemode.CATCH, new CatchParser());
 		//PARSERS.put(Gamemode.MANIA, new ManiaParser());
 	}
@@ -84,44 +82,9 @@ public class BeatmapParser {
 			
 			List<BreakPeriod> breaks = parseBreaks(parts.get("Events"));
 			List<TimingPoint> timingPoints = parseTimePoints(parts.get("TimingPoints"));
-			List<HitObject> hitObjects = parseHitObjects(parts.get("HitObjects"), parser);
+			List<String> rawObjects = parts.get("HitObjects").getLines();
 			
-			calculateSliderEnds(hitObjects, timingPoints, difficulties.getSliderMultiplier(), difficulties.getTickRate());
-			
-			return new Beatmap(generalSettings, editorState, metadata, difficulties, breaks, hitObjects, timingPoints);
-		}
-	}
-	
-	public static void calculateSliderEnds(List<HitObject> hitObjects, List<TimingPoint> timingPoints, double sliderVelocity, double tickRate) {
-		ListIterator<TimingPoint> timingIterator = timingPoints.listIterator();
-		ListIterator<OsuSlider> objectIterator = hitObjects.stream()
-				.filter(o->o instanceof OsuSlider)
-				.map(o->(OsuSlider)o)
-				.collect(Collectors.toList())
-				.listIterator();
-		
-		// find first parent point
-		TimingPoint parent = null;
-		while (parent == null || parent.isInherited())
-			parent = timingIterator.next();
-		
-		while (true) {
-			TimingPoint current = timingIterator.hasNext() ? timingIterator.next() : null;
-			TimingPoint previous = timingPoints.get(timingIterator.previousIndex() - (current == null ? 0 : 1));
-			if (!previous.isInherited()) parent = previous;
-			
-			while (objectIterator.hasNext()) {
-				OsuSlider slider = objectIterator.next();
-				if (current == null || slider.getStartTime() < current.getTimestamp()) {
-					slider.calculate(previous, parent, sliderVelocity, tickRate);
-				}
-				else {
-					objectIterator.previous();
-					break;
-				}	
-			}
-			
-			if (current == null) break;
+			return parser.buildBeatmap(generalSettings, editorState, metadata, difficulties, breaks, timingPoints, rawObjects);
 		}
 	}
 	
@@ -171,13 +134,6 @@ public class BeatmapParser {
 		return part.getLines().stream()
 			.filter(o->o.trim().startsWith("2,"))
 			.map(breakPeriodMapper)
-			.collect(Collectors.toList());
-	}
-	
-	private List<HitObject> parseHitObjects(FilePart part, HitObjectParser parser) {
-		return part.getLines().stream()
-			.map(parser::parse)
-			.sorted((o1, o2) -> (int)(o1.getStartTime() - o2.getStartTime()))
 			.collect(Collectors.toList());
 	}
 }

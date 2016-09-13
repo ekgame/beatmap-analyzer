@@ -1,6 +1,5 @@
 package lt.ekgame.beatmap_analyzer.beatmap.mania;
 
-import lt.ekgame.beatmap_analyzer.beatmap.HitObject;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
 public class ManiaSingle extends ManiaObject {
@@ -10,7 +9,7 @@ public class ManiaSingle extends ManiaObject {
 	}
 
 	@Override
-	public HitObject clone() {
+	public ManiaObject clone() {
 		return new ManiaSingle(position.clone(), startTime, hitSound);
 	}
 

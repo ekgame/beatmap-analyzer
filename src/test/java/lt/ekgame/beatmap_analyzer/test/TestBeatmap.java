@@ -6,11 +6,11 @@ import java.io.FileNotFoundException;
 import org.junit.Test;
 
 import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
-import lt.ekgame.beatmap_analyzer.calculator.Difficulty;
-import lt.ekgame.beatmap_analyzer.calculator.Performance;
-import lt.ekgame.beatmap_analyzer.calculator.PerformanceCalculator;
+import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapException;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
+import lt.ekgame.beatmap_analyzer.performance.Performance;
+import lt.ekgame.beatmap_analyzer.performance.PerformanceCalculator;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 import lt.ekgame.beatmap_analyzer.utils.ScoreVersion;
@@ -20,7 +20,7 @@ public class TestBeatmap {
 	@Test
 	public void test() throws FileNotFoundException, BeatmapException {
 		BeatmapParser parser = new BeatmapParser();
-		Beatmap beatmap = parser.parse(new File("blue_zenith.osu")).withMods(new Mods(Mod.HARDROCK));
+		Beatmap beatmap = parser.parse(new File("test_maps/osu/blue_zenith.osu")).withMods(new Mods(Mod.HARDROCK));
 		System.out.println(beatmap.getMaxCombo());
 		
 		Difficulty diff = beatmap.getDifficulty();

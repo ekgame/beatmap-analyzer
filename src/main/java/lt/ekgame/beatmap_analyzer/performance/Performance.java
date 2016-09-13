@@ -1,4 +1,4 @@
-package lt.ekgame.beatmap_analyzer.calculator;
+package lt.ekgame.beatmap_analyzer.performance;
 
 public class Performance {
 	
