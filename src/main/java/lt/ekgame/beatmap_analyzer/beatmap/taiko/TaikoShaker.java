@@ -14,4 +14,8 @@ public class TaikoShaker extends TaikoObject {
 		return new TaikoShaker(position.clone(), startTime, endTime, hitSound);
 	}
 
+	@Override
+	public int getCombo() {
+		return 0;
+	}
 }

@@ -8,12 +8,29 @@ import org.junit.Test;
 import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoBeatmap;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapException;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
+import lt.ekgame.beatmap_analyzer.performance.Performance;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
 public class TestTaiko {
-
+	
 	@Test
+	public void test_performance() throws FileNotFoundException, BeatmapException {
+		BeatmapParser parser = new BeatmapParser();
+		File file = new File("test_maps/taiko/x_u_inner_oni.osu");
+		TaikoBeatmap beatmap = parser.parse(file, TaikoBeatmap.class).withMods(Mods.parse(72));
+		System.out.println("mods: " + beatmap.getMods());
+		System.out.println("max combo: " + beatmap.getMaxCombo());
+		System.out.println("od: " + beatmap.getDifficultySettings().getOD());
+		System.out.println("stars: " + beatmap.getDifficulty().getStarDifficulty());
+		Performance perf = beatmap.getPerformance(2194, 24, 0, 0);
+		System.out.println("acc: " + perf.getAccuracy());
+		System.out.println("performance: " + perf.getPerformance());
+		System.out.println("strain_pp: " + perf.getSpeedPerformance());
+		System.out.println("acc_pp: " + perf.getAccuracyPerformance());
+	}
+
+	//@Test
 	public void test() throws FileNotFoundException, BeatmapException {
 		String[] files = {
 			"tomorrow_perfume_oni.osu",

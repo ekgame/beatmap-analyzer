@@ -13,18 +13,6 @@ import lt.ekgame.beatmap_analyzer.utils.ScoreVersion;
 
 public abstract class Beatmap {
 	
-	private final double 
-		ODMinMs = 79.5, // OD 0
-		ODMaxMs = 19.5, // OD 10
-		ARMinMs = 1800, // AR 0
-		ARMidMs = 1200, // AR 5
-		ARMaxMs = 450;  // AR 10
-
-	private final double 
-		ODStep = 6,
-		ARStepLow = 120,  // AR 0-5
-		ARStepHigh = 150; // AR 5-10
-	
 	protected BeatmapGenerals generals;
 	protected BeatmapEditorState editorState;
 	protected BeatmapMetadata metadata;
@@ -133,6 +121,18 @@ public abstract class Beatmap {
 		return timingPoints;
 	}
 	
+	protected void applyOverallDifficultyChange(double multiplier, double speedMultiplier) {
+		difficulties.setOD(MathUtils.recalculateOverallDifficulty(difficulties.getOD(), multiplier, speedMultiplier));
+	}
+	
+	protected void applyApproachRateChange(double multiplier, double speedMultiplier) {
+		difficulties.setAR(MathUtils.recalculateApproachRate(difficulties.getAR(), multiplier, speedMultiplier));
+	}
+	
+	protected void applyCircleSizeChange(double multiplier) {
+		difficulties.setCS(MathUtils.recalculateCircleSize(difficulties.getCS(), multiplier));
+	}
+	
 	protected void applySpeedChange(List<? extends HitObject> objects, double speedMultiplier) {
 		for (HitObject object : objects) {
 			object.setStartTime((int) (object.getStartTime()/speedMultiplier));
@@ -151,27 +151,7 @@ public abstract class Beatmap {
 		}
 	}
 	
-	protected void applyOverallDifficultyChange(double odMultiplier, double speedMultiplier) {
-		double overallDifficulty = difficulties.getOD()*odMultiplier;
-		double overallDifficultyTime = ODMinMs - Math.ceil(ODStep*overallDifficulty);
-		overallDifficultyTime = MathUtils.clamp(ODMaxMs, ODMinMs, overallDifficultyTime/speedMultiplier);
-		overallDifficulty = (ODMinMs - overallDifficultyTime)/ODStep;
-		difficulties.setOD(overallDifficulty);
-	}
 	
-	protected void applyApproachRateChange(double arMultiplier, double speedMultiplier) {
-		double approachRate = difficulties.getAR()*arMultiplier;
-		double approachRateTime = approachRate <= 5 ? (ARMinMs - ARStepLow*approachRate) : (ARMidMs - ARStepHigh*(approachRate - 5));
-		approachRateTime = MathUtils.clamp(ARMaxMs, ARMinMs, approachRateTime/speedMultiplier);
-		approachRate = approachRate <= 5 ? ((ARMinMs - approachRateTime)/ARStepLow) : (5 + (ARMidMs - approachRateTime)/ARStepHigh);
-		difficulties.setAR(approachRate);
-	}
-	
-	protected void applyCircleSizeChange(double csMultiplier) {
-		double circleSize = difficulties.getCS()*csMultiplier;
-		circleSize = MathUtils.clamp(0, 10, circleSize);
-		difficulties.setCS(circleSize);
-	}
 	
 	public abstract Beatmap withMods(Mods mods);
 }

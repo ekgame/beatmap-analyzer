@@ -16,6 +16,7 @@ import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuObject;
 import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
 import lt.ekgame.beatmap_analyzer.difficulty.TaikoDifficultyCalculator;
 import lt.ekgame.beatmap_analyzer.performance.PerformanceCalculator;
+import lt.ekgame.beatmap_analyzer.performance.TaikoPerformanceCalculator;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
@@ -23,6 +24,7 @@ public class TaikoBeatmap extends Beatmap {
 	
 	private List<TaikoObject> hitObjects;
 	private Difficulty difficulty;
+	private TaikoPerformanceCalculator performanceCalculator;
 	
 	public TaikoBeatmap(BeatmapGenerals generals, BeatmapEditorState editorState, BeatmapMetadata metadata,
 			BeatmapDifficulties difficulties, List<BreakPeriod> breaks, List<TimingPoint> timingPoints, 
@@ -35,32 +37,6 @@ public class TaikoBeatmap extends Beatmap {
 			List<TaikoObject> hitObjects, Mods mods) {
 		super(generals, editorState, metadata, difficulties, breaks, timingPoints, mods);
 		this.hitObjects = hitObjects;
-		
-		if (mods.isMapChanging()) {
-			double speedMultiplier = 1;
-			if (mods.has(Mod.DOUBLE_TIME) || mods.has(Mod.NIGHTCORE)) speedMultiplier *= 1.5;
-			if (mods.has(Mod.HALF_TIME)) speedMultiplier *= 0.75;
-
-			double odMultiplier = 1;
-			if (mods.has(Mod.HARDROCK)) odMultiplier *= 1.4;
-			if (mods.has(Mod.EASY)) odMultiplier *= 0.5;
-
-			double arMultiplier = 1;
-			if (mods.has(Mod.HARDROCK)) arMultiplier *= 1.4;
-			if (mods.has(Mod.EASY)) arMultiplier *= 0.5;
-
-			double csMultiplier = 1;
-			if (mods.has(Mod.HARDROCK)) csMultiplier *= 1.3;
-			if (mods.has(Mod.EASY)) csMultiplier *= 0.5;
-			
-			applyOverallDifficultyChange(odMultiplier, speedMultiplier);
-			applyApproachRateChange(arMultiplier, speedMultiplier);
-			applyCircleSizeChange(csMultiplier);
-			
-			//if (mods.isSpeedChanging())
-			//	applySpeedChange(hitObjects, speedMultiplier);
-		}
-		
 		finalizeObjects(hitObjects);
 	}
 
@@ -78,12 +54,14 @@ public class TaikoBeatmap extends Beatmap {
 
 	@Override
 	public PerformanceCalculator getPerformanceCalculator() {
-		return null;
+		if (performanceCalculator == null)
+			performanceCalculator = new TaikoPerformanceCalculator(this);
+		return performanceCalculator;
 	}
 
 	@Override
 	public int getMaxCombo() {
-		return 0;
+		return (int) hitObjects.stream().filter(o->o instanceof TaikoCircle).count();
 	}
 	
 	public List<TaikoObject> getHitObjects() {
