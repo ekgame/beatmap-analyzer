@@ -1,25 +1,9 @@
 package lt.ekgame.beatmap_analyzer.parser.hitobjects;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapDifficulties;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapEditorState;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapGenerals;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapMetadata;
-import lt.ekgame.beatmap_analyzer.beatmap.BreakPeriod;
-import lt.ekgame.beatmap_analyzer.beatmap.TimingPoint;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuCircle;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuObject;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSlider;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSpinner;
-import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoBeatmap;
-import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoCircle;
-import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoDrumroll;
-import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoObject;
-import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoShaker;
+import lt.ekgame.beatmap_analyzer.beatmap.*;
+import lt.ekgame.beatmap_analyzer.beatmap.taiko.*;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
 public class TaikoParser extends HitObjectParser<TaikoObject> {

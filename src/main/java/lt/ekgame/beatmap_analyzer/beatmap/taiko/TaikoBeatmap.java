@@ -4,20 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lt.ekgame.beatmap_analyzer.Gamemode;
-import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapDifficulties;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapEditorState;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapGenerals;
-import lt.ekgame.beatmap_analyzer.beatmap.BeatmapMetadata;
-import lt.ekgame.beatmap_analyzer.beatmap.BreakPeriod;
-import lt.ekgame.beatmap_analyzer.beatmap.TimingPoint;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
-import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuObject;
+import lt.ekgame.beatmap_analyzer.beatmap.*;
 import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
 import lt.ekgame.beatmap_analyzer.difficulty.TaikoDifficultyCalculator;
 import lt.ekgame.beatmap_analyzer.performance.PerformanceCalculator;
 import lt.ekgame.beatmap_analyzer.performance.TaikoPerformanceCalculator;
-import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
 public class TaikoBeatmap extends Beatmap {

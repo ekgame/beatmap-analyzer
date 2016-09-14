@@ -18,7 +18,6 @@ public abstract class HitObjectParser<T extends HitObject> {
 	
 	public List<T> parse(List<String> lines) {
 		return lines.stream().map(this::parse)
-			.sorted((o1, o2) -> (int)(o1.getStartTime() - o2.getStartTime()))
 			.collect(Collectors.toList());
 	}
 	

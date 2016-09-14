@@ -31,7 +31,7 @@ public class BeatmapParser {
 		PARSERS.put(Gamemode.OSU,   new OsuParser());
 		PARSERS.put(Gamemode.TAIKO, new TaikoParser());
 		//PARSERS.put(Gamemode.CATCH, new CatchParser());
-		//PARSERS.put(Gamemode.MANIA, new ManiaParser());
+		PARSERS.put(Gamemode.MANIA, new ManiaParser());
 	}
 	
 	@SuppressWarnings("unchecked")
