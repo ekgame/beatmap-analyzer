@@ -1,7 +1,5 @@
 package lt.ekgame.beatmap_analyzer.utils;
 
-import java.util.HashMap;
-
 import lt.ekgame.beatmap_analyzer.Gamemode;
 
 public class MathUtils {
@@ -81,5 +79,19 @@ public class MathUtils {
 	public static double recalculateCircleSize(double cs, double multiplier) {
 		double circleSize = cs*multiplier;
 		return MathUtils.clamp(0, 10, circleSize);
+	}
+	
+	public static int calculateManiaCollumn(double x, int collumns) {
+		return (int) (x/(512.0/collumns));
+	}
+	
+	public static double calculateOsuAccuracy(int num300, int num100, int num50, int numMiss) {
+		int total = num300 + num100 + num50 + numMiss;
+		return total == 0 ? 0 : ((num300*6 + num100*2 + num50)/(total*6.0));
+	}
+	
+	public static double calculateTaikoAccuracy(int numGreat, int numHalf, int numMiss) {
+		int total = numGreat + numHalf + numMiss;
+		return total == 0 ? 0 : ((numGreat*2 + numHalf)/(total*2.0));
 	}
 }

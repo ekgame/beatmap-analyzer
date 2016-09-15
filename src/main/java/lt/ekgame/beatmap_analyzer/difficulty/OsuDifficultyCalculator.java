@@ -5,13 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lt.ekgame.beatmap_analyzer.beatmap.HitObject;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuObject;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSpinner;
+import lt.ekgame.beatmap_analyzer.utils.Mods;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
-public class OsuDifficultyCalculator implements DifficultyCalculator {
+public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap> {
 
 	private static final double DECAY_BASE[] = {0.3, 0.15};
 	private static final double WEIGHT_SCALING[] = {1400, 26.25};
@@ -31,46 +31,52 @@ public class OsuDifficultyCalculator implements DifficultyCalculator {
 	private static final byte DIFF_SPEED = 0;
 	private static final byte DIFF_AIM = 1;
 	
-	private List<DifficultyObject> difficultyObjects;
-	
-	public OsuDifficultyCalculator(OsuBeatmap beatmap) {
-		double radius = (PLAYFIELD_WIDTH/16)*(1 - 0.7*(beatmap.getDifficultySettings().getCS() - 5)/5);
-		
-		difficultyObjects = beatmap.getHitObjects().stream()
-			.map(o->new DifficultyObject(o, radius))
-			.collect(Collectors.toList());
-		
-		DifficultyObject previous = null;
-		for (DifficultyObject current : difficultyObjects) {
-			if (previous != null) 
-				current.calculateStrains(previous);
-			previous = current;
-		}
-	}
-	
 	@Override
-	public Difficulty calculate() {
-		double aimDifficulty = Math.sqrt(calculateDifficulty(DIFF_AIM))*STAR_SCALING_FACTOR;
-		double speedDifficulty = Math.sqrt(calculateDifficulty(DIFF_SPEED))*STAR_SCALING_FACTOR;
+	public OsuDifficulty calculate(Mods mods, OsuBeatmap beatmap) {
+		double timeRate = mods.getSpeedMultiplier();
+		List<OsuObject> hitObjects = beatmap.getHitObjects();
+		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, beatmap.getCS(mods), timeRate);
 		
-		//aimDifficulty = (double)Math.round(aimDifficulty*100)/100;
-		//speedDifficulty = (double)Math.round(speedDifficulty*100)/100;
+		double aimDifficulty = Math.sqrt(calculateDifficulty(objects, DIFF_AIM, timeRate))*STAR_SCALING_FACTOR;
+		double speedDifficulty = Math.sqrt(calculateDifficulty(objects, DIFF_SPEED, timeRate))*STAR_SCALING_FACTOR;
 		
 		double starDifficulty = aimDifficulty + speedDifficulty + Math.abs(speedDifficulty - aimDifficulty)*EXTREME_SCALING_FACTOR;
-		return new Difficulty(aimDifficulty, speedDifficulty, starDifficulty);
+		return new OsuDifficulty(beatmap, mods, starDifficulty, aimDifficulty, speedDifficulty);
 	}
 	
-	private double calculateDifficulty(byte difficultyType) {
+	private List<DifficultyObject> generateDifficultyObjects(List<OsuObject> hitObjects, double csRating, double timeRate) {
+		double radius = (PLAYFIELD_WIDTH/16)*(1 - 0.7*(csRating - 5)/5);
+		
+		List<DifficultyObject> difficultyObjects = hitObjects.stream()
+			.map(o->new DifficultyObject(o, radius))
+			.sorted((a, b)-> a.object.getStartTime() - b.object.getStartTime())
+			.collect(Collectors.toList());
+    	
+    	DifficultyObject previous = null;
+		for (DifficultyObject current : difficultyObjects) {
+			if (previous != null)
+				current.calculateStrains(previous, timeRate);
+			previous = current;
+		}
+		
+		return difficultyObjects;
+    }
+	
+	private double calculateDifficulty(List<DifficultyObject> objects, byte difficultyType, double timeRate) {
 		List<Double> highestStrains = new ArrayList<>();
-		double intervalEnd = STRAIN_STEP;
+		double realStrainStep = STRAIN_STEP*timeRate;
+		double intervalEnd = realStrainStep;
 		double maxStrain = 0;
 		
 		DifficultyObject previous = null;
-		for (DifficultyObject current : difficultyObjects) {
+		for (DifficultyObject current : objects) {
 			while (current.object.getStartTime() > intervalEnd) {
 				highestStrains.add(maxStrain);
 				if (previous != null) {
-					double decay = Math.pow(DECAY_BASE[difficultyType], (double)(intervalEnd - previous.object.getStartTime())/1000);
+					double decay = Math.pow(
+						DECAY_BASE[difficultyType],
+						(double)(intervalEnd - previous.object.getStartTime())/1000
+					);
 					maxStrain = previous.strains[difficultyType]*decay;
 				}
 				intervalEnd += STRAIN_STEP;
@@ -107,14 +113,14 @@ public class OsuDifficultyCalculator implements DifficultyCalculator {
 			//normEnd = normStart;
 		}
 		
-		private void calculateStrains(DifficultyObject previous) {
-			calculateStrain(previous, DIFF_SPEED);
-			calculateStrain(previous, DIFF_AIM);
+		private void calculateStrains(DifficultyObject previous, double timeRate) {
+			calculateStrain(previous, timeRate, DIFF_SPEED);
+			calculateStrain(previous, timeRate, DIFF_AIM);
 		}
 		
-		private void calculateStrain(DifficultyObject previous, byte difficultyType) {
+		private void calculateStrain(DifficultyObject previous, double timeRate, byte difficultyType) {
 			double res = 0;
-			long timeElapsed = object.getStartTime() - previous.object.getStartTime();
+			double timeElapsed = (object.getStartTime() - previous.object.getStartTime())/timeRate;
 			double decay = Math.pow(DECAY_BASE[difficultyType], timeElapsed/1000f);
 			double scaling = WEIGHT_SCALING[difficultyType];
 			

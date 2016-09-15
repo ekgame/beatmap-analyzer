@@ -94,7 +94,7 @@ public class Mods {
 		return (speedChangingFlags & modFlags) > 0;
 	}
 	
-	public double getTimeRate() {
+	public double getSpeedMultiplier() {
 		if (has(Mod.DOUBLE_TIME) || has(Mod.NIGHTCORE))
 			return 1.5;
 		else if (has(Mod.HALF_TIME))

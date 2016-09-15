@@ -2,14 +2,14 @@ package lt.ekgame.beatmap_analyzer.difficulty;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import lt.ekgame.beatmap_analyzer.beatmap.taiko.*;
 import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoCircle.TaikoColor;
+import lt.ekgame.beatmap_analyzer.utils.Mods;
 
-public class TaikoDifficultyCalculator implements DifficultyCalculator {
+public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeatmap> {
 	
 	private static final double STAR_SCALING_FACTOR = 0.04125;
 	private static final double DECAY_WEIGHT = 0.9;
@@ -22,28 +22,34 @@ public class TaikoDifficultyCalculator implements DifficultyCalculator {
     private static final double RHYTHM_CHANGE_BASE_THRESHOLD = 0.2;
     private static final double RHYTHM_CHANGE_BASE = 2.0;
     
-    private List<DifficultyObject> difficultyObjects;
-    private final double timeRate;
-	
-	public TaikoDifficultyCalculator(TaikoBeatmap beatmap) {
-		difficultyObjects = beatmap.getHitObjects().stream()
+    @Override
+	public Difficulty<TaikoBeatmap> calculate(Mods mods, TaikoBeatmap beatmap) {
+		double timeRate = mods.getSpeedMultiplier();
+		List<TaikoObject> hitObjects = beatmap.getHitObjects();
+		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, timeRate);
+		List<Double> strains = calculateStrains(objects, timeRate);
+		double difficulty = calculateDifficulty(strains);
+		return new Difficulty<TaikoBeatmap>(beatmap, mods, difficulty);
+	}
+    
+    private List<DifficultyObject> generateDifficultyObjects(List<TaikoObject> hitObjects, double timeRate) {
+    	List<DifficultyObject> difficultyObjects = hitObjects.stream()
 			.map(o->new DifficultyObject(o))
 			.sorted((a, b)-> a.object.getStartTime() - b.object.getStartTime())
 			.collect(Collectors.toList());
-		
-		timeRate = beatmap.getMods().getTimeRate();
-		
-		DifficultyObject previous = null;
+    	
+    	DifficultyObject previous = null;
 		for (DifficultyObject current : difficultyObjects) {
 			if (previous != null) 
-				current.calculateStrain(previous);
+				current.calculateStrain(previous, timeRate);
 			previous = current;
 		}
-	}
-
-	@Override
-	public Difficulty calculate() {
-		List<Double> highestStrains = new ArrayList<>();
+		
+		return difficultyObjects;
+    }
+    
+    private List<Double> calculateStrains(List<DifficultyObject> difficultyObjects, double timeRate) {
+    	List<Double> highestStrains = new ArrayList<>();
 		double realStrainStep = STRAIN_STEP*timeRate;
 		double intervalEnd = realStrainStep;
 		double maxStrain = 0;
@@ -62,18 +68,18 @@ public class TaikoDifficultyCalculator implements DifficultyCalculator {
 			previous = current;
 		}
 		
-		double difficulty = 0, weight = 1;
 		Collections.sort(highestStrains, (a,b)->(int)(Math.signum(b-a)));
-		
-		for (double strain : highestStrains) {
+		return highestStrains;
+    }
+    
+    private double calculateDifficulty(List<Double> strains) {
+    	double difficulty = 0, weight = 1;
+		for (double strain : strains) {
 			difficulty += weight*strain;
 			weight *= DECAY_WEIGHT;
 		}
-		
-		difficulty *= STAR_SCALING_FACTOR;
-		
-		return new Difficulty(0, 0, difficulty);
-	}
+		return difficulty*STAR_SCALING_FACTOR;
+    }
 	
 	enum ColorSwitch {
 		NONE, EVEN, ODD
@@ -96,7 +102,7 @@ public class TaikoDifficultyCalculator implements DifficultyCalculator {
 				isBlue = ((TaikoCircle) object).getColor() == TaikoColor.BLUE;
 		}
 		
-		private void calculateStrain(DifficultyObject previous) {
+		private void calculateStrain(DifficultyObject previous, double timeRate) {
 			timeElapsed = (object.getStartTime() - previous.object.getStartTime())/timeRate;
 			double decay = Math.pow(DECAY_BASE, timeElapsed/1000);
 			double addition = 1;

@@ -1,32 +1,29 @@
 package lt.ekgame.beatmap_analyzer.beatmap.taiko;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lt.ekgame.beatmap_analyzer.Gamemode;
 import lt.ekgame.beatmap_analyzer.beatmap.*;
 import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
+import lt.ekgame.beatmap_analyzer.difficulty.OsuDifficulty;
+import lt.ekgame.beatmap_analyzer.difficulty.OsuDifficultyCalculator;
 import lt.ekgame.beatmap_analyzer.difficulty.TaikoDifficultyCalculator;
-import lt.ekgame.beatmap_analyzer.performance.PerformanceCalculator;
+import lt.ekgame.beatmap_analyzer.performance.OsuPerformanceCalculator;
+import lt.ekgame.beatmap_analyzer.performance.Performance;
 import lt.ekgame.beatmap_analyzer.performance.TaikoPerformanceCalculator;
+import lt.ekgame.beatmap_analyzer.performance.scores.OsuScore;
+import lt.ekgame.beatmap_analyzer.performance.scores.TaikoScore;
+import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
 public class TaikoBeatmap extends Beatmap {
 	
 	private List<TaikoObject> hitObjects;
-	private Difficulty difficulty;
-	private TaikoPerformanceCalculator performanceCalculator;
-	
-	public TaikoBeatmap(BeatmapGenerals generals, BeatmapEditorState editorState, BeatmapMetadata metadata,
-			BeatmapDifficulties difficulties, List<BreakPeriod> breaks, List<TimingPoint> timingPoints, 
-			List<TaikoObject> hitObjects) {
-		this(generals, editorState, metadata, difficulties, breaks, timingPoints, hitObjects, Mods.NOMOD);
-	}
 
 	public TaikoBeatmap(BeatmapGenerals generals, BeatmapEditorState editorState, BeatmapMetadata metadata,
 			BeatmapDifficulties difficulties, List<BreakPeriod> breaks, List<TimingPoint> timingPoints, 
-			List<TaikoObject> hitObjects, Mods mods) {
-		super(generals, editorState, metadata, difficulties, breaks, timingPoints, mods);
+			List<TaikoObject> hitObjects) {
+		super(generals, editorState, metadata, difficulties, breaks, timingPoints);
 		this.hitObjects = hitObjects;
 		finalizeObjects(hitObjects);
 	}
@@ -37,17 +34,13 @@ public class TaikoBeatmap extends Beatmap {
 	}
 
 	@Override
-	public Difficulty getDifficulty() {
-		if (difficulty == null)
-			difficulty = new TaikoDifficultyCalculator(this).calculate();
-		return difficulty;
+	public Difficulty<TaikoBeatmap> getDifficulty(Mods mods) {
+		return new TaikoDifficultyCalculator().calculate(mods, this);
 	}
 
 	@Override
-	public PerformanceCalculator getPerformanceCalculator() {
-		if (performanceCalculator == null)
-			performanceCalculator = new TaikoPerformanceCalculator(this);
-		return performanceCalculator;
+	public Difficulty<TaikoBeatmap> getDifficulty() {
+		return getDifficulty(Mods.NOMOD);
 	}
 
 	@Override
@@ -60,20 +53,15 @@ public class TaikoBeatmap extends Beatmap {
 	}
 
 	@Override
-	public TaikoBeatmap withMods(Mods mods) {
-		if (!this.mods.isNomod())
-			throw new IllegalStateException("This beatmap already has mods applied to it.");
-
-		BeatmapGenerals generals = this.generals.clone();
-		BeatmapEditorState editorState = this.editorState.clone();
-		BeatmapMetadata metadata = this.metadata.clone();
-		BeatmapDifficulties difficulties = this.difficulties.clone();
-
-		List<TaikoObject> hitObjects = this.hitObjects.stream().map(o -> (TaikoObject) o.clone()).collect(Collectors.toList());
-		List<BreakPeriod> breaks = this.breaks.stream().map(o -> o.clone()).collect(Collectors.toList());
-		List<TimingPoint> timingPoints = this.timingPoints.stream().map(o -> o.clone()).collect(Collectors.toList());
-
-		return new TaikoBeatmap(generals, editorState, metadata, difficulties, breaks, timingPoints, hitObjects, mods);
+	public int getObjectCount() {
+		return hitObjects.size();
 	}
-
+	
+	public Performance getPerformance(TaikoScore score, Mods mods) {
+		return new TaikoPerformanceCalculator().calculate(getDifficulty(mods), score);
+	}
+	
+	public Performance getPerformance(TaikoScore score, Mod... mods) {
+		return getPerformance(score, new Mods(mods));
+	}
 }

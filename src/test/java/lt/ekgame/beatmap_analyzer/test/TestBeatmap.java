@@ -5,30 +5,31 @@ import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
-import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
-import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
+import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
+import lt.ekgame.beatmap_analyzer.difficulty.OsuDifficulty;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapException;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
 import lt.ekgame.beatmap_analyzer.performance.Performance;
-import lt.ekgame.beatmap_analyzer.performance.PerformanceCalculator;
+import lt.ekgame.beatmap_analyzer.performance.scores.OsuScore;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
-import lt.ekgame.beatmap_analyzer.utils.ScoreVersion;
 
 public class TestBeatmap {
 
 	@Test
 	public void test() throws FileNotFoundException, BeatmapException {
 		BeatmapParser parser = new BeatmapParser();
-		Beatmap beatmap = parser.parse(new File("test_maps/osu/blue_zenith.osu")).withMods(new Mods(Mod.HARDROCK));
+		OsuBeatmap beatmap = parser.parse(new File("test_maps/osu/blue_zenith.osu"), OsuBeatmap.class);
 		System.out.println(beatmap.getMaxCombo());
 		
-		Difficulty diff = beatmap.getDifficulty();
-		System.out.println("stars: " + diff.getStarDifficulty());
-		System.out.println("aim:   " + diff.getAimDifficulty());
-		System.out.println("speed: " + diff.getSpeedDifficulty());
+		OsuDifficulty diff = beatmap.getDifficulty(new Mods(Mod.HARDROCK));
+		System.out.println("stars: " + diff.getStars());
+		System.out.println("aim:   " + diff.getAim());
+		System.out.println("speed: " + diff.getSpeed());
 		
-		Performance perf = beatmap.getPerformance(2358, 0.9971, 1);
+		OsuScore score = OsuScore.of(beatmap).combo(2358).accuracy(0.9971, 1).build();
+		
+		Performance perf = beatmap.getPerformance(score, Mod.HARDROCK);
 		System.out.println("\nacc:      " + perf.getAccuracy());
 		System.out.println("aim_pp:   " + perf.getAimPerformance());
 		System.out.println("speed_pp: " + perf.getSpeedPerformance());

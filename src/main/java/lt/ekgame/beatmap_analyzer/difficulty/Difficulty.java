@@ -1,24 +1,50 @@
 package lt.ekgame.beatmap_analyzer.difficulty;
 
-public class Difficulty {
+import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
+import lt.ekgame.beatmap_analyzer.utils.Mod;
+import lt.ekgame.beatmap_analyzer.utils.Mods;
+
+public class Difficulty<T extends Beatmap> {
 	
-	private double aimDifficulty, speedDifficulty, starDifficulty;
+	protected T beatmap;
+	protected Mods mods;
+	protected double starDiff;
 	
-	public Difficulty(double aimDifficulty, double speedDifficulty, double starDifficulty) {
-		this.aimDifficulty = aimDifficulty;
-		this.speedDifficulty = speedDifficulty;
-		this.starDifficulty = starDifficulty;
+	public Difficulty(T beatmap, Mods mods, double starDiff) {
+		this.beatmap = beatmap;
+		this.mods = mods;
+		this.starDiff = starDiff;
+	}
+	
+	public double getSpeedMultiplier() {
+		return mods.getSpeedMultiplier();
+	}
+	
+	public double getOD() {
+		return beatmap.getDifficultySettings().getOD();
+	}
+	
+	public T getBeatmap() {
+		return beatmap;
+	}
+	
+	public Mods getMods() {
+		return mods;
 	}
 
-	public double getAimDifficulty() {
-		return aimDifficulty;
+	public double getStars() {
+		return starDiff;
 	}
 
-	public double getSpeedDifficulty() {
-		return speedDifficulty;
+	public int getMaxCombo() {
+		return beatmap.getMaxCombo();
 	}
-
-	public double getStarDifficulty() {
-		return starDifficulty;
+	
+	public int getObjectCount() {
+		return beatmap.getObjectCount();
+	}
+	
+	public boolean hasMod(Mod mod) {
+		return mods.has(mod);
 	}
 }
