@@ -29,7 +29,7 @@ public class TestBeatmap {
 		
 		OsuScore score = OsuScore.of(beatmap).combo(2358).accuracy(0.9971, 1).build();
 		
-		Performance perf = beatmap.getPerformance(score, Mod.HARDROCK);
+		Performance perf = diff.getPerformance(score);
 		System.out.println("\nacc:      " + perf.getAccuracy());
 		System.out.println("aim_pp:   " + perf.getAimPerformance());
 		System.out.println("speed_pp: " + perf.getSpeedPerformance());

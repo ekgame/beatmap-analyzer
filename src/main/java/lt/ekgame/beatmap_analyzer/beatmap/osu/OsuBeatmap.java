@@ -4,12 +4,8 @@ import java.util.List;
 
 import lt.ekgame.beatmap_analyzer.Gamemode;
 import lt.ekgame.beatmap_analyzer.beatmap.*;
-import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
 import lt.ekgame.beatmap_analyzer.difficulty.OsuDifficulty;
 import lt.ekgame.beatmap_analyzer.difficulty.OsuDifficultyCalculator;
-import lt.ekgame.beatmap_analyzer.performance.OsuPerformanceCalculator;
-import lt.ekgame.beatmap_analyzer.performance.Performance;
-import lt.ekgame.beatmap_analyzer.performance.scores.OsuScore;
 import lt.ekgame.beatmap_analyzer.utils.MathUtils;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
@@ -96,13 +92,5 @@ public class OsuBeatmap extends Beatmap {
 	@Override
 	public OsuDifficulty getDifficulty() {
 		return getDifficulty(Mods.NOMOD);
-	}
-	
-	public Performance getPerformance(OsuScore score, Mods mods) {
-		return new OsuPerformanceCalculator().calculate(getDifficulty(mods), score);
-	}
-	
-	public Performance getPerformance(OsuScore score, Mod... mods) {
-		return getPerformance(score, new Mods(mods));
 	}
 }

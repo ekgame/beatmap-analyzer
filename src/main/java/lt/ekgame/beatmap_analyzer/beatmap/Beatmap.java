@@ -60,15 +60,13 @@ public abstract class Beatmap {
 	
 	public abstract Gamemode getGamemode();
 	
-	public abstract Difficulty<?> getDifficulty(Mods mods);
+	public abstract Difficulty<?,?> getDifficulty(Mods mods);
 	
-	public abstract Difficulty<?> getDifficulty();
+	public abstract Difficulty<?,?> getDifficulty();
 	
 	public abstract int getMaxCombo();
 	
 	public abstract int getObjectCount();
-	
-	
 
 	public BeatmapGenerals getGenerals() {
 		return generals;

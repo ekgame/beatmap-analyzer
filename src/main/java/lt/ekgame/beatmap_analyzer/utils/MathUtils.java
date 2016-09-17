@@ -28,14 +28,15 @@ public class MathUtils {
 			diff = Math.min(10, diff*1.4);
 		
         return (diff > 5) ? (mid + (max - mid) * (diff - 5) / 5) 
-	    	 : (diff < 5) ? (mid - (mid - min) * (5 - diff) / 5) 
-	    	 : mid;
+        	: (diff < 5) ? (mid - (mid - min) * (5 - diff) / 5) 
+	    	: mid;
 	}
 	
 	public static int getHitWindow50(double od, Gamemode gamemode, Mods mods) {
+		double speed = mods.getSpeedMultiplier();
 		switch (gamemode) {
-		case OSU: return (int) difficultyRange(od, 200, 150, 100, mods);
-		case TAIKO: return (int) difficultyRange(od, 135, 95, 70, mods);
+		case OSU: return (int) (difficultyRange(od, 200, 150, 100, mods)/speed);
+		case TAIKO: return (int) (difficultyRange(od, 135, 95, 70, mods)/speed);
 		case CATCH: return -1;
 		case MANIA: return -1; // TODO: mania timing
 		default: return -1;
@@ -43,9 +44,10 @@ public class MathUtils {
 	}
 	
 	public static int getHitWindow100(double od, Gamemode gamemode, Mods mods) {
+		double speed = mods.getSpeedMultiplier();
         switch (gamemode) {
-		case OSU: return (int) difficultyRange(od, 140, 100, 60, mods);
-		case TAIKO: return (int) difficultyRange(od, 120, 80, 50, mods);
+		case OSU: return (int) (difficultyRange(od, 140, 100, 60, mods)/speed);
+		case TAIKO: return (int) (difficultyRange(od, 120, 80, 50, mods)/speed);
 		case CATCH: return -1;
 		case MANIA: return -1;  // TODO: mania timing
 		default: return -1;
@@ -53,9 +55,10 @@ public class MathUtils {
 	}
 	
 	public static int getHitWindow300(double od, Gamemode gamemode, Mods mods) {
+		double speed = mods.getSpeedMultiplier();
 		switch (gamemode) {
-		case OSU: return (int) difficultyRange(od, 80, 50, 20, mods);
-		case TAIKO: return (int) difficultyRange(od, 50, 35, 20, mods);
+		case OSU: return (int) (difficultyRange(od, 80, 50, 20, mods)/speed);
+		case TAIKO: return (int) (difficultyRange(od, 50, 35, 20, mods)/speed);
 		case CATCH: return -1;
 		case MANIA: return -1;  // TODO: mania timing
 		default: return -1;
@@ -93,5 +96,10 @@ public class MathUtils {
 	public static double calculateTaikoAccuracy(int numGreat, int numHalf, int numMiss) {
 		int total = numGreat + numHalf + numMiss;
 		return total == 0 ? 0 : ((numGreat*2 + numHalf)/(total*2.0));
+	}
+	
+	public static double calculateManiaAccuracy(int numMax300, int num300, int num200, int num100, int num50, int numMiss) {
+		int total = numMax300 + num300 + num200 + num100 + num50 + numMiss;
+		return total == 0 ? 0 : (((numMax300 + num300)*6 + num200*4 + num100*2 + num50)/(total*6.0));
 	}
 }

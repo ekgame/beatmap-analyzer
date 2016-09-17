@@ -7,9 +7,10 @@ import java.util.stream.Collectors;
 
 import lt.ekgame.beatmap_analyzer.beatmap.taiko.*;
 import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoCircle.TaikoColor;
+import lt.ekgame.beatmap_analyzer.performance.scores.TaikoScore;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
-public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeatmap> {
+public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeatmap, TaikoScore> {
 	
 	private static final double STAR_SCALING_FACTOR = 0.04125;
 	private static final double DECAY_WEIGHT = 0.9;
@@ -23,13 +24,13 @@ public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeat
     private static final double RHYTHM_CHANGE_BASE = 2.0;
     
     @Override
-	public Difficulty<TaikoBeatmap> calculate(Mods mods, TaikoBeatmap beatmap) {
+	public TaikoDifficulty calculate(Mods mods, TaikoBeatmap beatmap) {
 		double timeRate = mods.getSpeedMultiplier();
 		List<TaikoObject> hitObjects = beatmap.getHitObjects();
 		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, timeRate);
 		List<Double> strains = calculateStrains(objects, timeRate);
 		double difficulty = calculateDifficulty(strains);
-		return new Difficulty<TaikoBeatmap>(beatmap, mods, difficulty);
+		return new TaikoDifficulty(beatmap, mods, difficulty);
 	}
     
     private List<DifficultyObject> generateDifficultyObjects(List<TaikoObject> hitObjects, double timeRate) {

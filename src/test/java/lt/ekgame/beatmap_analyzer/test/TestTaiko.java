@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import org.junit.Test;
 
 import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoBeatmap;
+import lt.ekgame.beatmap_analyzer.difficulty.TaikoDifficulty;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapException;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
 import lt.ekgame.beatmap_analyzer.performance.Performance;
@@ -20,14 +21,17 @@ public class TestTaiko {
 		BeatmapParser parser = new BeatmapParser();
 		File file = new File("test_maps/taiko/x_u_inner_oni.osu");
 		TaikoBeatmap beatmap = parser.parse(file, TaikoBeatmap.class);
+		
 		Mods mods = Mods.parse(72);
+		TaikoDifficulty diff = beatmap.getDifficulty(mods);
 		
 		System.out.println("max combo: " + beatmap.getMaxCombo());
 		System.out.println("od: " + beatmap.getDifficultySettings().getOD());
 		System.out.println("stars: " + beatmap.getDifficulty(mods).getStars());
 		
 		TaikoScore score = TaikoScore.of(beatmap).combo(2194).accuracy(24).build();
-		Performance perf = beatmap.getPerformance(score, mods);
+		Performance perf = diff.getPerformance(score);
+		
 		System.out.println("acc: " + perf.getAccuracy());
 		System.out.println("performance: " + perf.getPerformance());
 		System.out.println("strain_pp: " + perf.getSpeedPerformance());

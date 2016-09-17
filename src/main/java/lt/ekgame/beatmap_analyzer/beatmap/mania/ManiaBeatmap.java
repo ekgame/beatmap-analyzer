@@ -10,8 +10,7 @@ import lt.ekgame.beatmap_analyzer.beatmap.BeatmapGenerals;
 import lt.ekgame.beatmap_analyzer.beatmap.BeatmapMetadata;
 import lt.ekgame.beatmap_analyzer.beatmap.BreakPeriod;
 import lt.ekgame.beatmap_analyzer.beatmap.TimingPoint;
-import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoBeatmap;
-import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
+import lt.ekgame.beatmap_analyzer.difficulty.ManiaDifficulty;
 import lt.ekgame.beatmap_analyzer.difficulty.ManiaDifficultyCalculator;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
@@ -34,12 +33,12 @@ public class ManiaBeatmap extends Beatmap {
 	}
 
 	@Override
-	public Difficulty<ManiaBeatmap> getDifficulty(Mods mods) {
+	public ManiaDifficulty getDifficulty(Mods mods) {
 		return new ManiaDifficultyCalculator().calculate(mods, this);
 	}
 	
 	@Override
-	public Difficulty<ManiaBeatmap> getDifficulty() {
+	public ManiaDifficulty getDifficulty() {
 		return getDifficulty(Mods.NOMOD);
 	}
 	

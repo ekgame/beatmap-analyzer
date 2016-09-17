@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lt.ekgame.beatmap_analyzer.Gamemode;
+
 public class Mods {
 	
 	public static final Mods NOMOD = new Mods();
@@ -100,5 +102,23 @@ public class Mods {
 		else if (has(Mod.HALF_TIME))
 			return 0.75;
 		return 1;
+	}
+	
+	public double getScoreMultiplier(Gamemode mode) {
+		double multiplier = 1;
+		if (has(Mod.NO_FAIL)) multiplier *= 0.5;
+		if (has(Mod.HALF_TIME)) multiplier *= mode == Gamemode.MANIA ? 0.5 : 0.3;
+		if (has(Mod.HIDDEN)) multiplier *= mode == Gamemode.MANIA ? 1 : 1.06;
+		if (has(Mod.FLASHLIGHT)) multiplier *= mode == Gamemode.MANIA ? 1 : 1.12;
+		
+		if (has(Mod.HARDROCK))
+			multiplier *= mode == Gamemode.CATCH ? 1.12 : mode == Gamemode.MANIA ? 1 : 1.06;
+		
+		if (has(Mod.DOUBLE_TIME) || has(Mod.NIGHTCORE)) 
+			multiplier *= mode == Gamemode.CATCH ? 1.06 : mode == Gamemode.MANIA ? 1 : 1.12;
+		
+		// TODO: if we get around implementing map converting to mania, there are xK mods.
+		
+		return multiplier;
 	}
 }

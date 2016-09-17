@@ -8,10 +8,11 @@ import java.util.stream.Collectors;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuObject;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSpinner;
+import lt.ekgame.beatmap_analyzer.performance.scores.OsuScore;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
-public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap> {
+public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap, OsuScore> {
 
 	private static final double DECAY_BASE[] = {0.3, 0.15};
 	private static final double WEIGHT_SCALING[] = {1400, 26.25};

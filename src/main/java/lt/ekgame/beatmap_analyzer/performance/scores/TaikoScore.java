@@ -5,12 +5,12 @@ import lt.ekgame.beatmap_analyzer.utils.MathUtils;
 
 public class TaikoScore implements Score {
 	
-	private int combo, numGreat, numHalf, numMiss;
+	private int combo, numMiss;
+	private double accuracy;
 	
-	private TaikoScore(int combo, int numGreat, int numHalf, int numMiss) {
+	private TaikoScore(int combo, double accuracy, int numMiss) {
 		this.combo = combo;
-		this.numGreat = numGreat;
-		this.numHalf = numHalf;
+		this.accuracy = accuracy;
 		this.numMiss = numMiss;
 	}
 	
@@ -23,7 +23,7 @@ public class TaikoScore implements Score {
 	}
 	
 	public double getAccuracy() {
-		return MathUtils.calculateTaikoAccuracy(numGreat, numHalf, numMiss);
+		return accuracy;
 	}
 
 	public static ScoreBuilder of(TaikoBeatmap beatmap) {
@@ -33,8 +33,8 @@ public class TaikoScore implements Score {
 	public static class ScoreBuilder {
 		
 		private TaikoBeatmap beatmap;
-		private int combo;
-		private int numGreat, numHalf, numMiss;
+		private int combo, numMiss;
+		private double accuracy;
 		
 		ScoreBuilder(TaikoBeatmap beatmap) {
 			this.beatmap = beatmap;
@@ -46,19 +46,29 @@ public class TaikoScore implements Score {
 			return this;
 		}
 		
+		public ScoreBuilder accuracy(double accuracy) {
+			return accuracy(accuracy, 0);
+		}
+		
+		public ScoreBuilder accuracy(double accuracy, int numMiss) {
+			this.numMiss = numMiss;
+			this.accuracy = accuracy;
+			return this;
+		}
+		
 		public ScoreBuilder accuracy(int numHalf) {
 			return accuracy(numHalf, 0);
 		}
 		
 		public ScoreBuilder accuracy(int numHalf, int numMiss) {
-			this.numHalf = numHalf;
 			this.numMiss = numMiss;
-			this.numGreat = beatmap.getMaxCombo() - numHalf - numMiss;
+			int numGreat = beatmap.getMaxCombo() - numHalf - numMiss;
+			accuracy = MathUtils.calculateTaikoAccuracy(numGreat, numHalf, numMiss);
 			return this;
 		}
 		
 		public TaikoScore build() {
-			return new TaikoScore(combo, numGreat, numHalf, numMiss);
+			return new TaikoScore(combo, accuracy, numMiss);
 		}
 	}
 }

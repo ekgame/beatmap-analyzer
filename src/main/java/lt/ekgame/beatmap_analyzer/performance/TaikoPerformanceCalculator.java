@@ -1,16 +1,15 @@
 package lt.ekgame.beatmap_analyzer.performance;
 
 import lt.ekgame.beatmap_analyzer.Gamemode;
-import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoBeatmap;
-import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
+import lt.ekgame.beatmap_analyzer.difficulty.TaikoDifficulty;
 import lt.ekgame.beatmap_analyzer.performance.scores.TaikoScore;
 import lt.ekgame.beatmap_analyzer.utils.MathUtils;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 
-public class TaikoPerformanceCalculator implements PerformanceCalculator<Difficulty<TaikoBeatmap>, TaikoScore> {
+public class TaikoPerformanceCalculator implements PerformanceCalculator<TaikoDifficulty, TaikoScore> {
 	
 	@Override
-	public Performance calculate(Difficulty<TaikoBeatmap> difficulty, TaikoScore score) {
+	public Performance calculate(TaikoDifficulty difficulty, TaikoScore score) {
 		double multiplier = 1.1;
 		
 		if (difficulty.hasMod(Mod.NO_FAIL))
@@ -30,7 +29,7 @@ public class TaikoPerformanceCalculator implements PerformanceCalculator<Difficu
 		return new Performance(accuracy, performance, 0, strainValue, accValue);
 	}
 	
-	private double calculateStrainValue(Difficulty<TaikoBeatmap> difficulty, TaikoScore score) {
+	private double calculateStrainValue(TaikoDifficulty difficulty, TaikoScore score) {
 		double strainValue = Math.pow(5*Math.max(1, difficulty.getStars()/0.0075) - 4, 2)/100000;
 		double lengthBonus = 1 + 0.1 * Math.min(1, difficulty.getObjectCount() / 1500.0);
 		strainValue *= lengthBonus;
@@ -51,9 +50,9 @@ public class TaikoPerformanceCalculator implements PerformanceCalculator<Difficu
 		return strainValue*score.getAccuracy();
 	}
 	
-	private double calculateAccuracyValue(Difficulty<TaikoBeatmap> difficulty, TaikoScore score) {
+	private double calculateAccuracyValue(TaikoDifficulty difficulty, TaikoScore score) {
 		System.out.println(difficulty.getMods());
-		int perfectHitWindow = (int) (MathUtils.getHitWindow300(difficulty.getOD(), Gamemode.TAIKO, difficulty.getMods())/difficulty.getSpeedMultiplier());
+		int perfectHitWindow = MathUtils.getHitWindow300(difficulty.getOD(), Gamemode.TAIKO, difficulty.getMods());
 		if (perfectHitWindow <= 0)
 			return 0;
 		

@@ -2,9 +2,12 @@ package lt.ekgame.beatmap_analyzer.difficulty;
 
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuCircle;
+import lt.ekgame.beatmap_analyzer.performance.OsuPerformanceCalculator;
+import lt.ekgame.beatmap_analyzer.performance.Performance;
+import lt.ekgame.beatmap_analyzer.performance.scores.OsuScore;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
-public class OsuDifficulty extends Difficulty<OsuBeatmap> {
+public class OsuDifficulty extends Difficulty<OsuBeatmap, OsuScore> {
 	
 	private double aimDiff, speedDiff;
 	
@@ -32,5 +35,10 @@ public class OsuDifficulty extends Difficulty<OsuBeatmap> {
 	
 	public int getNumCircles() {
 		return (int) beatmap.getHitObjects().stream().filter(o->o instanceof OsuCircle).count();
+	}
+
+	@Override
+	public Performance getPerformance(OsuScore score) {
+		return new OsuPerformanceCalculator().calculate(this, score);
 	}
 }
