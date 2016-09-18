@@ -126,17 +126,8 @@ public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeat
 			if (isBlue != previous.isBlue) {
 				lastColorSwitch = previous.sameColorChain % 2 == 0 ? ColorSwitch.EVEN : ColorSwitch.ODD;
 				
-				switch (previous.lastColorSwitch) {
-				case EVEN:
-					if (lastColorSwitch == ColorSwitch.ODD)
-						return COLOR_CHANGE_BONUS;
-					break;
-					
-				case ODD:
-					if (lastColorSwitch == ColorSwitch.EVEN)
-						return COLOR_CHANGE_BONUS;
-					break;
-				}
+				if (previous.lastColorSwitch != ColorSwitch.NONE && previous.lastColorSwitch != lastColorSwitch)
+					return COLOR_CHANGE_BONUS;
 			}
 			else {
 				lastColorSwitch = previous.lastColorSwitch;
