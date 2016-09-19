@@ -26,7 +26,7 @@ public class TestMania {
 		ManiaDifficulty diff = beatmap.getDifficulty();
 		System.out.println("stars: " + beatmap.getDifficulty().getStars());
 		
-		ManiaScore score = ManiaScore.of(beatmap).accuracy(39, 2, 4, 2).score(978993).build();
+		ManiaScore score = ManiaScore.of(beatmap).score(978993).accuracy(39, 2, 1, 2).build();
 		Performance perf = diff.getPerformance(score);
 		System.out.println("\nacc: " + perf.getAccuracy());
 		System.out.println("pp: " + perf.getPerformance());

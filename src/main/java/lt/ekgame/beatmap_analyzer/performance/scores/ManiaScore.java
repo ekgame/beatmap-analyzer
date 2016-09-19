@@ -40,11 +40,6 @@ public class ManiaScore implements Score {
 			return this;
 		}
 		
-		public ScoreBuilder accuracy(double accuracy) {
-			this.accuracy = accuracy;
-			return this;
-		}
-		
 		public ScoreBuilder accuracy(int num200, int num100) {
 			return accuracy(num200, num100, 0, 0);
 		}
@@ -56,6 +51,11 @@ public class ManiaScore implements Score {
 		public ScoreBuilder accuracy(int num200, int num100, int num50, int numMiss) {
 			int num300 = beatmap.getObjectCount() - num200 - num100 - num50 - numMiss;
 			return accuracy(MathUtils.calculateManiaAccuracy(0, num300, num200, num100, num50, numMiss));
+		}
+		
+		public ScoreBuilder accuracy(double accuracy) {
+			this.accuracy = accuracy;
+			return this;
 		}
 		
 		public ManiaScore build() {

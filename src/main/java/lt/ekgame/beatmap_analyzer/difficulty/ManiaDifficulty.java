@@ -16,5 +16,4 @@ public class ManiaDifficulty extends Difficulty<ManiaBeatmap, ManiaScore> {
 	public Performance getPerformance(ManiaScore score) {
 		return new ManiaPerformanceCalculator().calculate(this, score);
 	}
-
 }

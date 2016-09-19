@@ -27,7 +27,7 @@ public class ManiaPerformanceCalculator implements PerformanceCalculator<ManiaDi
 		if (scoreMultiplier <= 0)
 			return 0;
 		
-		int actualScore = (int) (score.getScore() * (1/scoreMultiplier));
+		int actualScore = (int) Math.round(score.getScore() * (1/scoreMultiplier));
 		
 		double strainValue = Math.pow(5*Math.max(1, difficulty.getStars()/0.0825f) - 4, 3)/110000;
 		strainValue *= 1 + 0.1*Math.min(1, difficulty.getObjectCount()/1500.0);
@@ -51,7 +51,8 @@ public class ManiaPerformanceCalculator implements PerformanceCalculator<ManiaDi
 	private double calculateAccuracy(ManiaDifficulty difficulty, ManiaScore score) {
 		// TODO: converted maps have different hit window
 		double od = Math.min(10, Math.max(0, 10 - difficulty.getOD()));
-		double hitWindow = (34 + 3*od)/difficulty.getSpeedMultiplier();
+		double hitWindow = (34 + 3*od);///difficulty.getSpeedMultiplier();
+		System.out.println(hitWindow);
 		if (hitWindow <= 0)
 			return 0;
 		
