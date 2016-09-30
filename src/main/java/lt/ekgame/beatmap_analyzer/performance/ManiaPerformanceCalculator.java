@@ -3,7 +3,6 @@ package lt.ekgame.beatmap_analyzer.performance;
 import lt.ekgame.beatmap_analyzer.Gamemode;
 import lt.ekgame.beatmap_analyzer.difficulty.ManiaDifficulty;
 import lt.ekgame.beatmap_analyzer.performance.scores.ManiaScore;
-import lt.ekgame.beatmap_analyzer.utils.MathUtils;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 
 public class ManiaPerformanceCalculator implements PerformanceCalculator<ManiaDifficulty, ManiaScore> {

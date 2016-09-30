@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import lt.ekgame.beatmap_analyzer.beatmap.mania.ManiaBeatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.mania.ManiaObject;
 import lt.ekgame.beatmap_analyzer.performance.scores.ManiaScore;
-import lt.ekgame.beatmap_analyzer.utils.Introsort;
 import lt.ekgame.beatmap_analyzer.utils.MathUtils;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 import lt.ekgame.beatmap_analyzer.utils.Quicksort;
@@ -44,11 +43,9 @@ public class ManiaDifficultyCalculator implements DifficultyCalculator<ManiaBeat
 		// This algorithm depends on the order of the difficulty objects.
 		// Mania has lots of notes on the same timestamp.
 		Quicksort.sort(difficultyObjects);
-		// This is still not precise and might produce about 0.05 error for the
-		// final result.
+		// This is still not precise and might produce about 0.05 error for the final result.
 		// Because of this error, the current highest PP score is calculated
-		// as if it is worth 7.73pp more (actual: 1209.12pp, calculated:
-		// 1216.85)
+		// as if it is worth 7.73pp more (actual: 1209.12pp, calculated: 1216.85)
 
 		DifficultyObject previous = null;
 		for (DifficultyObject current : difficultyObjects) {
