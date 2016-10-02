@@ -33,7 +33,7 @@ public class TestMania {
 		System.out.println("strain: " + perf.getSpeedPerformance());
 		System.out.println("acc: " + perf.getAccuracyPerformance());
 		
-		ManiaDifficulty diffReal = new ManiaDifficulty(beatmap, Mods.NOMOD, 7.949989318847656);
+		ManiaDifficulty diffReal = new ManiaDifficulty(beatmap, Mods.NOMOD, 7.949989318847656, null);
 		Performance perf2 = diffReal.getPerformance(score);
 		System.out.println("\nacc: " + perf2.getAccuracy());
 		System.out.println("pp: " + perf2.getPerformance());

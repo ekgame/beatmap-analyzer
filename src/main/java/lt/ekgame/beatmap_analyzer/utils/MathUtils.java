@@ -102,4 +102,14 @@ public class MathUtils {
 		int total = numMax300 + num300 + num200 + num100 + num50 + numMiss;
 		return total == 0 ? 0 : (((numMax300 + num300)*6 + num200*4 + num100*2 + num50)/(total*6.0));
 	}
+	
+	public static double calculateCatchAccuracy(int numFruit, int numTick, int numDroplet, int numMiss, int numDropletMiss) {
+		int total = numFruit + numTick + numDroplet + numMiss + numDropletMiss;
+		return total == 0 ? 0 : (numFruit + numTick + numDroplet)/((double)total);
+	}
+	
+	public static double calculateCatchAccuracy(int numHits, int numMisses) {
+		int total = numHits + numMisses;
+		return total == 0 ? 0 : (numHits)/((double)total);
+	}
 }

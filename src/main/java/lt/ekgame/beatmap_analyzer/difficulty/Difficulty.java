@@ -1,5 +1,7 @@
 package lt.ekgame.beatmap_analyzer.difficulty;
 
+import java.util.List;
+
 import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
 import lt.ekgame.beatmap_analyzer.performance.Performance;
 import lt.ekgame.beatmap_analyzer.performance.scores.Score;
@@ -11,14 +13,20 @@ public abstract class Difficulty<B extends Beatmap, S extends Score> {
 	protected B beatmap;
 	protected Mods mods;
 	protected double starDiff;
+	protected List<Double> strains;
 	
-	public Difficulty(B beatmap, Mods mods, double starDiff) {
+	public Difficulty(B beatmap, Mods mods, double starDiff, List<Double> strains) {
 		this.beatmap = beatmap;
 		this.mods = mods;
 		this.starDiff = starDiff;
+		this.strains = strains;
 	}
 	
 	public abstract Performance getPerformance(S score);
+	
+	public List<Double> getStrains() {
+		return strains;
+	}
 	
 	public double getSpeedMultiplier() {
 		return mods.getSpeedMultiplier();

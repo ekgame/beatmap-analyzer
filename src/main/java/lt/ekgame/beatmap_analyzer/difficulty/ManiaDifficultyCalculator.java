@@ -27,8 +27,9 @@ public class ManiaDifficultyCalculator implements DifficultyCalculator<ManiaBeat
 		List<ManiaObject> hitObjects = beatmap.getHitObjects();
 		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, timeRate, beatmap.getCollumns());
 		List<Double> strains = calculateStrains(objects, timeRate);
+		List<Double> originalStrains = Collections.unmodifiableList(strains);
 		double difficulty = calculateDifficulty(strains);
-		return new ManiaDifficulty(beatmap, mods, difficulty);
+		return new ManiaDifficulty(beatmap, mods, difficulty, originalStrains);
 	}
 
 	private List<DifficultyObject> generateDifficultyObjects(List<ManiaObject> hitObjects, double timeRate,
@@ -80,12 +81,11 @@ public class ManiaDifficultyCalculator implements DifficultyCalculator<ManiaBeat
 			maxStrain = Math.max(maxStrain, current.individualStrains[current.collumn] + current.strain);
 			previous = current;
 		}
-
-		Collections.sort(highestStrains, (a, b) -> b.compareTo(a));
 		return highestStrains;
 	}
 
 	private double calculateDifficulty(List<Double> strains) {
+		Collections.sort(strains, (a, b) -> b.compareTo(a));
 		double difficulty = 0, weight = 1;
 		for (double strain : strains) {
 			difficulty += weight * strain;

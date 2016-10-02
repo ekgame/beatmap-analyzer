@@ -1,5 +1,9 @@
 package lt.ekgame.beatmap_analyzer.difficulty;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuCircle;
 import lt.ekgame.beatmap_analyzer.performance.OsuPerformanceCalculator;
@@ -11,10 +15,35 @@ public class OsuDifficulty extends Difficulty<OsuBeatmap, OsuScore> {
 	
 	private double aimDiff, speedDiff;
 	
-	public OsuDifficulty(OsuBeatmap beatmap, Mods mods, double starDiff, double aimDiff, double speedDiff) {
-		super(beatmap, mods, starDiff);
+	private List<Double> aimStrains;
+	private List<Double> speedStrains;
+	
+	public OsuDifficulty(OsuBeatmap beatmap, Mods mods, double starDiff, double aimDiff, double speedDiff, List<Double> aimStrains, List<Double> speedStrains) {
+		super(beatmap, mods, starDiff, mergeStrains(aimStrains, speedStrains));
 		this.aimDiff = aimDiff;
 		this.speedDiff = speedDiff;
+		this.aimStrains = aimStrains;
+		this.speedStrains = speedStrains;
+	}
+	
+	private static List<Double> mergeStrains(List<Double> aimStrains, List<Double> speedStrains) {
+		List<Double> overall = new ArrayList<Double>();
+		Iterator<Double> aimIterator = aimStrains.iterator();
+		Iterator<Double> speedIterator = speedStrains.iterator();
+		while (aimIterator.hasNext() && speedIterator.hasNext()) {
+			Double aimStrain = aimIterator.next();
+			Double speedStrain = speedIterator.next();
+			overall.add(aimStrain + speedStrain + Math.abs(speedStrain - aimStrain)*OsuDifficultyCalculator.EXTREME_SCALING_FACTOR);
+		}
+		return overall;
+	}
+	
+	public List<Double> getAimStrains() {
+		return aimStrains;
+	}
+	
+	public List<Double> getSpeedStrains() {
+		return speedStrains;
 	}
 
 	public double getAim() {

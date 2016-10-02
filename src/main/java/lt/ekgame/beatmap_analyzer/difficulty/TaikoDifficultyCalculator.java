@@ -29,8 +29,9 @@ public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeat
 		List<TaikoObject> hitObjects = beatmap.getHitObjects();
 		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, timeRate);
 		List<Double> strains = calculateStrains(objects, timeRate);
+		List<Double> strainsOriginal = Collections.unmodifiableList(strains);
 		double difficulty = calculateDifficulty(strains);
-		return new TaikoDifficulty(beatmap, mods, difficulty);
+		return new TaikoDifficulty(beatmap, mods, difficulty, strainsOriginal);
 	}
     
     private List<DifficultyObject> generateDifficultyObjects(List<TaikoObject> hitObjects, double timeRate) {
@@ -69,11 +70,11 @@ public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeat
 			previous = current;
 		}
 		
-		Collections.sort(highestStrains, (a,b)->(int)(Math.signum(b-a)));
 		return highestStrains;
     }
     
     private double calculateDifficulty(List<Double> strains) {
+    	Collections.sort(strains, (a,b)->(int)(Math.signum(b-a)));
     	double difficulty = 0, weight = 1;
 		for (double strain : strains) {
 			difficulty += weight*strain;

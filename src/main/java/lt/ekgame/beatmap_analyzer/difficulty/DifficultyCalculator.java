@@ -7,5 +7,6 @@ import lt.ekgame.beatmap_analyzer.utils.Mods;
 public interface DifficultyCalculator<T extends Beatmap, S extends Score> {
 	
 	public Difficulty<T, S> calculate(Mods mods, T beatmap);
+	
 
 }
