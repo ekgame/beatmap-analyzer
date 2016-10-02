@@ -12,16 +12,16 @@ import lt.ekgame.beatmap_analyzer.utils.Mods;
 
 public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeatmap, TaikoScore> {
 	
-	private static final double STAR_SCALING_FACTOR = 0.04125;
-	private static final double DECAY_WEIGHT = 0.9;
-	private static final int STRAIN_STEP = 400;
+	public static final double STAR_SCALING_FACTOR = 0.04125;
+	public static final double DECAY_WEIGHT = 0.9;
+	public static final int STRAIN_STEP = 400;
 	
-	private static final double DECAY_BASE = 0.30;
-	private static final double COLOR_CHANGE_BONUS = 0.75;
+	public static final double DECAY_BASE = 0.30;
+	public static final double COLOR_CHANGE_BONUS = 0.75;
 	
-	private static final double RHYTHM_CHANGE_BONUS = 1.0;
-    private static final double RHYTHM_CHANGE_BASE_THRESHOLD = 0.2;
-    private static final double RHYTHM_CHANGE_BASE = 2.0;
+	public static final double RHYTHM_CHANGE_BONUS = 1.0;
+	public static final double RHYTHM_CHANGE_BASE_THRESHOLD = 0.2;
+	public static final double RHYTHM_CHANGE_BASE = 2.0;
     
     @Override
 	public TaikoDifficulty calculate(Mods mods, TaikoBeatmap beatmap) {

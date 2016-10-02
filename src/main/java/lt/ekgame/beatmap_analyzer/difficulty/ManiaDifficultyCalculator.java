@@ -14,13 +14,13 @@ import lt.ekgame.beatmap_analyzer.utils.Quicksort;
 
 public class ManiaDifficultyCalculator implements DifficultyCalculator<ManiaBeatmap, ManiaScore> {
 
-	private static final double STAR_SCALING_FACTOR = 0.018;
+	public static final double STAR_SCALING_FACTOR = 0.018;
 
-	private static final double INDIVIDUAL_DECAY_BASE = 0.125;
-	private static final double OVERALL_DECAY_BASE = 0.3;
+	public static final double INDIVIDUAL_DECAY_BASE = 0.125;
+	public static final double OVERALL_DECAY_BASE = 0.3;
 
-	private static final double DECAY_WEIGHT = 0.9;
-	private static final int STRAIN_STEP = 400;
+	public static final double DECAY_WEIGHT = 0.9;
+	public static final int STRAIN_STEP = 400;
 
 	public ManiaDifficulty calculate(Mods mods, ManiaBeatmap beatmap) {
 		double timeRate = mods.getSpeedMultiplier();

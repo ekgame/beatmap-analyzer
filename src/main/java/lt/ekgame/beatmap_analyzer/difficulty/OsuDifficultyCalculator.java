@@ -14,23 +14,23 @@ import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
 public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap, OsuScore> {
 
-	private static final double DECAY_BASE[] = {0.3, 0.15};
-	private static final double WEIGHT_SCALING[] = {1400, 26.25};
-	private static final double STAR_SCALING_FACTOR = 0.0675;
+	public static final double DECAY_BASE[] = {0.3, 0.15};
+	public static final double WEIGHT_SCALING[] = {1400, 26.25};
+	public static final double STAR_SCALING_FACTOR = 0.0675;
 	public static final double EXTREME_SCALING_FACTOR = 0.5;
-	private static final float PLAYFIELD_WIDTH = 512;
-	private static final double DECAY_WEIGHT = 0.9;
+	public static final float PLAYFIELD_WIDTH = 512;
+	public static final double DECAY_WEIGHT = 0.9;
 	
-	private static final double ALMOST_DIAMETER = 90;
-	private static final double STREAM_SPACING = 110;
-	private static final double SINGLE_SPACING = 125;
+	public static final double ALMOST_DIAMETER = 90;
+	public static final double STREAM_SPACING = 110;
+	public static final double SINGLE_SPACING = 125;
 	
-	private static final int STRAIN_STEP = 400;
+	public static final int STRAIN_STEP = 400;
 	
-	private static final float CIRCLE_SIZE_BUFF_TRESHOLD = 30;
+	public static final float CIRCLE_SIZE_BUFF_TRESHOLD = 30;
 	
-	private static final byte DIFF_SPEED = 0;
-	private static final byte DIFF_AIM = 1;
+	public static final byte DIFF_SPEED = 0;
+	public static final byte DIFF_AIM = 1;
 	
 	@Override
 	public OsuDifficulty calculate(Mods mods, OsuBeatmap beatmap) {
