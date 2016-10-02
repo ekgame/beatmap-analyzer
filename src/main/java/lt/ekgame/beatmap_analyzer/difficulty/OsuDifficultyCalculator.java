@@ -41,8 +41,8 @@ public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap,
 		List<Double> aimStrains = calculateStrains(objects, DIFF_AIM, timeRate);
 		List<Double> speedStrains = calculateStrains(objects, DIFF_SPEED, timeRate);
 		
-		List<Double> aimStrainsOriginal = new ArrayList<>(aimStrains);
-		List<Double> speedStrainsOriginal = new ArrayList<>(speedStrains);
+		List<Double> aimStrainsOriginal = aimStrains.stream().map((d) -> d*WEIGHT_SCALING[DIFF_AIM]).collect(Collectors.toList());
+		List<Double> speedStrainsOriginal = speedStrains.stream().map((d) -> d*WEIGHT_SCALING[DIFF_SPEED]).collect(Collectors.toList());
 		
 		double aimDifficulty = Math.sqrt(calculateDifficulty(aimStrains))*STAR_SCALING_FACTOR;
 		double speedDifficulty = Math.sqrt(calculateDifficulty(speedStrains))*STAR_SCALING_FACTOR;
