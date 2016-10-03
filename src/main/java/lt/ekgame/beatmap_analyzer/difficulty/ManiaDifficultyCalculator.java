@@ -27,7 +27,7 @@ public class ManiaDifficultyCalculator implements DifficultyCalculator<ManiaBeat
 		List<ManiaObject> hitObjects = beatmap.getHitObjects();
 		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, timeRate, beatmap.getCollumns());
 		List<Double> strains = calculateStrains(objects, timeRate);
-		List<Double> originalStrains = strains.stream().map((d) -> d*STAR_SCALING_FACTOR).collect(Collectors.toList());
+		List<Double> originalStrains = strains.stream().map((d) -> d).collect(Collectors.toList());
 		double difficulty = calculateDifficulty(strains);
 		return new ManiaDifficulty(beatmap, mods, difficulty, originalStrains);
 	}
