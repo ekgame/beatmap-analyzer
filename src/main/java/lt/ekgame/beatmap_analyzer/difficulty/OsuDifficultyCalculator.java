@@ -44,8 +44,8 @@ public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap,
 		List<Double> aimStrainsOriginal = aimStrains.stream().map((d) -> d).collect(Collectors.toList());
 		List<Double> speedStrainsOriginal = speedStrains.stream().map((d) -> d).collect(Collectors.toList());
 		
-		double aimDifficulty = Math.sqrt(calculateDifficulty(aimStrains))*STAR_SCALING_FACTOR;
-		double speedDifficulty = Math.sqrt(calculateDifficulty(speedStrains))*STAR_SCALING_FACTOR;
+		double aimDifficulty = calculateDifficulty(aimStrains);
+		double speedDifficulty = calculateDifficulty(speedStrains);
 		
 		double starDifficulty = aimDifficulty + speedDifficulty + Math.abs(speedDifficulty - aimDifficulty)*EXTREME_SCALING_FACTOR;
 		return new OsuDifficulty(beatmap, mods, starDifficulty, aimDifficulty, speedDifficulty, aimStrainsOriginal, speedStrainsOriginal);
@@ -94,7 +94,7 @@ public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap,
 		return highestStrains;
 	}
 	
-	private double calculateDifficulty(List<Double> strains) {
+	public double calculateDifficulty(List<Double> strains) {
 		Collections.sort(strains, (a,b)->(int)(Math.signum(b-a)));
 		
 		double difficulty = 0, weight = 1;
@@ -103,7 +103,7 @@ public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap,
 			weight *= DECAY_WEIGHT;
 		}
 		
-		return difficulty;
+		return Math.sqrt(difficulty)*STAR_SCALING_FACTOR;
 	}
 
 	class DifficultyObject {

@@ -73,7 +73,7 @@ public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeat
 		return highestStrains;
     }
     
-    private double calculateDifficulty(List<Double> strains) {
+    public double calculateDifficulty(List<Double> strains) {
     	Collections.sort(strains, (a,b)->(int)(Math.signum(b-a)));
     	double difficulty = 0, weight = 1;
 		for (double strain : strains) {
