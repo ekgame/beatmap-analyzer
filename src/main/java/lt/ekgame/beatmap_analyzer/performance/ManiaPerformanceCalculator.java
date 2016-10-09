@@ -1,27 +1,30 @@
 package lt.ekgame.beatmap_analyzer.performance;
 
 import lt.ekgame.beatmap_analyzer.Gamemode;
+import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
 import lt.ekgame.beatmap_analyzer.difficulty.ManiaDifficulty;
-import lt.ekgame.beatmap_analyzer.performance.scores.ManiaScore;
+import lt.ekgame.beatmap_analyzer.performance.scores.Score;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 
-public class ManiaPerformanceCalculator implements PerformanceCalculator<ManiaDifficulty, ManiaScore> {
+public class ManiaPerformanceCalculator implements PerformanceCalculator {
 
 	@Override
-	public Performance calculate(ManiaDifficulty difficulty, ManiaScore score) {
-		double strainValue = calculateStrain(difficulty, score);
-		double accValue = calculateAccuracy(difficulty, score);
+	public Performance calculate(Difficulty difficulty, Score score) {
+		ManiaDifficulty diff = (ManiaDifficulty) difficulty;
+		
+		double strainValue = calculateStrain(diff, score);
+		double accValue = calculateAccuracy(diff, score);
 		
 		double multiplier = 1.1;
-		if (difficulty.hasMod(Mod.NO_FAIL)) multiplier *= 0.9;
-		if (difficulty.hasMod(Mod.SPUN_OUT)) multiplier *= 0.95;
-		if (difficulty.hasMod(Mod.EASY)) multiplier *= 0.5;
+		if (diff.hasMod(Mod.NO_FAIL)) multiplier *= 0.9;
+		if (diff.hasMod(Mod.SPUN_OUT)) multiplier *= 0.95;
+		if (diff.hasMod(Mod.EASY)) multiplier *= 0.5;
 			
 		double performance =  Math.pow(Math.pow(strainValue, 1.1) + Math.pow(accValue, 1.1), 1/1.1) * multiplier;
 		return new Performance(score.getAccuracy(), performance, 0, strainValue, accValue);
 	}
 	
-	private double calculateStrain(ManiaDifficulty difficulty, ManiaScore score) {
+	private double calculateStrain(ManiaDifficulty difficulty, Score score) {
 		double scoreMultiplier = difficulty.getMods().getScoreMultiplier(Gamemode.MANIA);
 		if (scoreMultiplier <= 0)
 			return 0;
@@ -47,11 +50,10 @@ public class ManiaPerformanceCalculator implements PerformanceCalculator<ManiaDi
 		return strainValue;
 	}
 	
-	private double calculateAccuracy(ManiaDifficulty difficulty, ManiaScore score) {
+	private double calculateAccuracy(ManiaDifficulty difficulty, Score score) {
 		// TODO: converted maps have different hit window
 		double od = Math.min(10, Math.max(0, 10 - difficulty.getOD()));
 		double hitWindow = (34 + 3*od);///difficulty.getSpeedMultiplier();
-		System.out.println(hitWindow);
 		if (hitWindow <= 0)
 			return 0;
 		
@@ -59,5 +61,4 @@ public class ManiaPerformanceCalculator implements PerformanceCalculator<ManiaDi
 		accuracyValue *= Math.min(1.15, Math.pow(difficulty.getObjectCount()/1500.0, 0.3));
 		return accuracyValue;
 	}
-
 }

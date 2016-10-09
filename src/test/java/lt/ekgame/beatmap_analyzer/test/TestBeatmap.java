@@ -10,7 +10,7 @@ import lt.ekgame.beatmap_analyzer.difficulty.OsuDifficulty;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapException;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
 import lt.ekgame.beatmap_analyzer.performance.Performance;
-import lt.ekgame.beatmap_analyzer.performance.scores.OsuScore;
+import lt.ekgame.beatmap_analyzer.performance.scores.Score;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
@@ -27,7 +27,7 @@ public class TestBeatmap {
 		System.out.println("aim:   " + diff.getAim());
 		System.out.println("speed: " + diff.getSpeed());
 		
-		OsuScore score = OsuScore.of(beatmap).combo(2358).accuracy(0.9971, 1).build();
+		Score score = Score.of(beatmap).combo(2358).accuracy(0.9971, 1).build();
 		
 		Performance perf = diff.getPerformance(score);
 		System.out.println("\nacc:      " + perf.getAccuracy());

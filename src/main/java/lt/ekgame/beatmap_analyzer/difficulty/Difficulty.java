@@ -8,21 +8,21 @@ import lt.ekgame.beatmap_analyzer.performance.scores.Score;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
-public abstract class Difficulty<B extends Beatmap, S extends Score> {
+public abstract class Difficulty {
 	
-	protected B beatmap;
+	protected Beatmap beatmap;
 	protected Mods mods;
 	protected double starDiff;
 	protected List<Double> strains;
 	
-	public Difficulty(B beatmap, Mods mods, double starDiff, List<Double> strains) {
+	public Difficulty(Beatmap beatmap, Mods mods, double starDiff, List<Double> strains) {
 		this.beatmap = beatmap;
 		this.mods = mods;
 		this.starDiff = starDiff;
 		this.strains = strains;
 	}
 	
-	public abstract Performance getPerformance(S score);
+	public abstract Performance getPerformance(Score score);
 	
 	public List<Double> getStrains() {
 		return strains;
@@ -36,7 +36,7 @@ public abstract class Difficulty<B extends Beatmap, S extends Score> {
 		return beatmap.getDifficultySettings().getOD();
 	}
 	
-	public B getBeatmap() {
+	public Beatmap getBeatmap() {
 		return beatmap;
 	}
 	

@@ -22,7 +22,7 @@ public abstract class HitObjectParser<T extends HitObject> {
 	}
 	
 	public abstract Beatmap buildBeatmap(BeatmapGenerals generals, BeatmapEditorState editorState,
-			BeatmapMetadata metadata, BeatmapDifficulties difficulties,
-			List<BreakPeriod> breaks, List<TimingPoint> timingPoints, List<String> rawObjects);
+			BeatmapMetadata metadata, BeatmapDifficulties difficulties, List<BreakPeriod> breaks,
+			List<TimingPoint> timingPoints, List<String> rawObjects);
 	
 }

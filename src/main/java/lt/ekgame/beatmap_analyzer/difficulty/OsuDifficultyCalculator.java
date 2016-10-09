@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuBeatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuObject;
 import lt.ekgame.beatmap_analyzer.beatmap.osu.OsuSpinner;
-import lt.ekgame.beatmap_analyzer.performance.scores.OsuScore;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 import lt.ekgame.beatmap_analyzer.utils.Vec2;
 
-public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap, OsuScore> {
+public class OsuDifficultyCalculator implements DifficultyCalculator {
 
 	public static final double DECAY_BASE[] = {0.3, 0.15};
 	public static final double WEIGHT_SCALING[] = {1400, 26.25};
@@ -33,22 +33,24 @@ public class OsuDifficultyCalculator implements DifficultyCalculator<OsuBeatmap,
 	public static final byte DIFF_AIM = 1;
 	
 	@Override
-	public OsuDifficulty calculate(Mods mods, OsuBeatmap beatmap) {
+	public OsuDifficulty calculate(Mods mods, Beatmap beatmap) {
+		OsuBeatmap bm = (OsuBeatmap) beatmap;
+		
 		double timeRate = mods.getSpeedMultiplier();
-		List<OsuObject> hitObjects = beatmap.getHitObjects();
-		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, beatmap.getCS(mods), timeRate);
+		List<OsuObject> hitObjects = bm.getHitObjects();
+		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, bm.getCS(mods), timeRate);
 		
 		List<Double> aimStrains = calculateStrains(objects, DIFF_AIM, timeRate);
 		List<Double> speedStrains = calculateStrains(objects, DIFF_SPEED, timeRate);
 		
-		List<Double> aimStrainsOriginal = aimStrains.stream().map((d) -> d).collect(Collectors.toList());
-		List<Double> speedStrainsOriginal = speedStrains.stream().map((d) -> d).collect(Collectors.toList());
+		List<Double> aimStrainsOriginal = new ArrayList<>(aimStrains);
+		List<Double> speedStrainsOriginal = new ArrayList<>(speedStrains);
 		
 		double aimDifficulty = calculateDifficulty(aimStrains);
 		double speedDifficulty = calculateDifficulty(speedStrains);
 		
 		double starDifficulty = aimDifficulty + speedDifficulty + Math.abs(speedDifficulty - aimDifficulty)*EXTREME_SCALING_FACTOR;
-		return new OsuDifficulty(beatmap, mods, starDifficulty, aimDifficulty, speedDifficulty, aimStrainsOriginal, speedStrainsOriginal);
+		return new OsuDifficulty(bm, mods, starDifficulty, aimDifficulty, speedDifficulty, aimStrainsOriginal, speedStrainsOriginal);
 	}
 	
 	private List<DifficultyObject> generateDifficultyObjects(List<OsuObject> hitObjects, double csRating, double timeRate) {

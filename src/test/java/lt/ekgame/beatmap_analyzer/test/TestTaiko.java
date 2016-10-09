@@ -10,7 +10,7 @@ import lt.ekgame.beatmap_analyzer.difficulty.TaikoDifficulty;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapException;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
 import lt.ekgame.beatmap_analyzer.performance.Performance;
-import lt.ekgame.beatmap_analyzer.performance.scores.TaikoScore;
+import lt.ekgame.beatmap_analyzer.performance.scores.Score;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
@@ -29,7 +29,7 @@ public class TestTaiko {
 		System.out.println("od: " + beatmap.getDifficultySettings().getOD());
 		System.out.println("stars: " + beatmap.getDifficulty(mods).getStars());
 		
-		TaikoScore score = TaikoScore.of(beatmap).combo(2194).accuracy(24).build();
+		Score score = Score.of(beatmap).combo(2194).taikoAccuracy(24).build();
 		Performance perf = diff.getPerformance(score);
 		
 		System.out.println("acc: " + perf.getAccuracy());

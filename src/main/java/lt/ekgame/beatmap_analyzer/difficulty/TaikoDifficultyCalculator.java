@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.taiko.*;
 import lt.ekgame.beatmap_analyzer.beatmap.taiko.TaikoCircle.TaikoColor;
-import lt.ekgame.beatmap_analyzer.performance.scores.TaikoScore;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
-public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeatmap, TaikoScore> {
+public class TaikoDifficultyCalculator implements DifficultyCalculator {
 	
 	public static final double STAR_SCALING_FACTOR = 0.04125;
 	public static final double DECAY_WEIGHT = 0.9;
@@ -24,14 +24,15 @@ public class TaikoDifficultyCalculator implements DifficultyCalculator<TaikoBeat
 	public static final double RHYTHM_CHANGE_BASE = 2.0;
     
     @Override
-	public TaikoDifficulty calculate(Mods mods, TaikoBeatmap beatmap) {
+	public TaikoDifficulty calculate(Mods mods, Beatmap beatmap) {
+    	TaikoBeatmap bm = (TaikoBeatmap) beatmap;
 		double timeRate = mods.getSpeedMultiplier();
-		List<TaikoObject> hitObjects = beatmap.getHitObjects();
+		List<TaikoObject> hitObjects = bm.getHitObjects();
 		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, timeRate);
 		List<Double> strains = calculateStrains(objects, timeRate);
-		List<Double> strainsOriginal = strains.stream().map((d) -> d).collect(Collectors.toList());
+		List<Double> strainsOriginal = new ArrayList<>(strains);
 		double difficulty = calculateDifficulty(strains);
-		return new TaikoDifficulty(beatmap, mods, difficulty, strainsOriginal);
+		return new TaikoDifficulty(bm, mods, difficulty, strainsOriginal);
 	}
     
     private List<DifficultyObject> generateDifficultyObjects(List<TaikoObject> hitObjects, double timeRate) {

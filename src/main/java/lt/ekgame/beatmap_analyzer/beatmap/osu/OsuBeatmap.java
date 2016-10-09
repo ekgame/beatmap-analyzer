@@ -83,10 +83,15 @@ public class OsuBeatmap extends Beatmap {
 	public int getObjectCount() {
 		return hitObjects.size();
 	}
+	
+	@Override
+	public OsuDifficultyCalculator getDifficultyCalculator() {
+		return new OsuDifficultyCalculator();
+	}
 
 	@Override
 	public OsuDifficulty getDifficulty(Mods mods) {
-		return new OsuDifficultyCalculator().calculate(mods, this);
+		return getDifficultyCalculator().calculate(mods, this);
 	}
 
 	@Override

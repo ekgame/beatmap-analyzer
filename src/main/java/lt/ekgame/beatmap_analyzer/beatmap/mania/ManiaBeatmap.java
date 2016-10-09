@@ -31,10 +31,15 @@ public class ManiaBeatmap extends Beatmap {
 	public Gamemode getGamemode() {
 		return Gamemode.MANIA;
 	}
+	
+	@Override
+	public ManiaDifficultyCalculator getDifficultyCalculator() {
+		return new ManiaDifficultyCalculator();
+	}
 
 	@Override
 	public ManiaDifficulty getDifficulty(Mods mods) {
-		return new ManiaDifficultyCalculator().calculate(mods, this);
+		return getDifficultyCalculator().calculate(mods, this);
 	}
 	
 	@Override

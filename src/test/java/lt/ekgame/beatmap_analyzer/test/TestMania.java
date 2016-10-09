@@ -12,7 +12,7 @@ import lt.ekgame.beatmap_analyzer.difficulty.ManiaDifficulty;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapException;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
 import lt.ekgame.beatmap_analyzer.performance.Performance;
-import lt.ekgame.beatmap_analyzer.performance.scores.ManiaScore;
+import lt.ekgame.beatmap_analyzer.performance.scores.Score;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
 public class TestMania {
@@ -26,7 +26,7 @@ public class TestMania {
 		ManiaDifficulty diff = beatmap.getDifficulty();
 		System.out.println("stars: " + beatmap.getDifficulty().getStars());
 		
-		ManiaScore score = ManiaScore.of(beatmap).score(978993).accuracy(39, 2, 1, 2).build();
+		Score score = Score.of(beatmap).score(978993).maniaAccuracy(39, 2, 1, 2).build();
 		Performance perf = diff.getPerformance(score);
 		System.out.println("\nacc: " + perf.getAccuracy());
 		System.out.println("pp: " + perf.getPerformance());

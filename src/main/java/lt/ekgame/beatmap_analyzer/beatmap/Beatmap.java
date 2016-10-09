@@ -5,6 +5,7 @@ import java.util.ListIterator;
 
 import lt.ekgame.beatmap_analyzer.Gamemode;
 import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
+import lt.ekgame.beatmap_analyzer.difficulty.DifficultyCalculator;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 
 public abstract class Beatmap {
@@ -60,9 +61,11 @@ public abstract class Beatmap {
 	
 	public abstract Gamemode getGamemode();
 	
-	public abstract Difficulty<?,?> getDifficulty(Mods mods);
+	public abstract DifficultyCalculator getDifficultyCalculator();
 	
-	public abstract Difficulty<?,?> getDifficulty();
+	public abstract Difficulty getDifficulty(Mods mods);
+	
+	public abstract Difficulty getDifficulty();
 	
 	public abstract int getMaxCombo();
 	

@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.mania.ManiaBeatmap;
 import lt.ekgame.beatmap_analyzer.beatmap.mania.ManiaObject;
-import lt.ekgame.beatmap_analyzer.performance.scores.ManiaScore;
 import lt.ekgame.beatmap_analyzer.utils.MathUtils;
 import lt.ekgame.beatmap_analyzer.utils.Mods;
 import lt.ekgame.beatmap_analyzer.utils.Quicksort;
 
-public class ManiaDifficultyCalculator implements DifficultyCalculator<ManiaBeatmap, ManiaScore> {
+public class ManiaDifficultyCalculator implements DifficultyCalculator {
 
 	public static final double STAR_SCALING_FACTOR = 0.018;
 
@@ -22,14 +22,15 @@ public class ManiaDifficultyCalculator implements DifficultyCalculator<ManiaBeat
 	public static final double DECAY_WEIGHT = 0.9;
 	public static final int STRAIN_STEP = 400;
 
-	public ManiaDifficulty calculate(Mods mods, ManiaBeatmap beatmap) {
+	public ManiaDifficulty calculate(Mods mods, Beatmap beatmap) {
+		ManiaBeatmap bm = (ManiaBeatmap) beatmap;
 		double timeRate = mods.getSpeedMultiplier();
-		List<ManiaObject> hitObjects = beatmap.getHitObjects();
-		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, timeRate, beatmap.getCollumns());
+		List<ManiaObject> hitObjects = bm.getHitObjects();
+		List<DifficultyObject> objects = generateDifficultyObjects(hitObjects, timeRate, bm.getCollumns());
 		List<Double> strains = calculateStrains(objects, timeRate);
-		List<Double> originalStrains = strains.stream().map((d) -> d).collect(Collectors.toList());
+		List<Double> originalStrains = new ArrayList<>(strains);
 		double difficulty = calculateDifficulty(strains);
-		return new ManiaDifficulty(beatmap, mods, difficulty, originalStrains);
+		return new ManiaDifficulty(bm, mods, difficulty, originalStrains);
 	}
 
 	private List<DifficultyObject> generateDifficultyObjects(List<ManiaObject> hitObjects, double timeRate,

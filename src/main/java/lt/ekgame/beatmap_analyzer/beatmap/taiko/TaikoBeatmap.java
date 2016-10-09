@@ -38,10 +38,15 @@ public class TaikoBeatmap extends Beatmap {
 	public int getObjectCount() {
 		return hitObjects.size();
 	}
+	
+	@Override
+	public TaikoDifficultyCalculator getDifficultyCalculator() {
+		return new TaikoDifficultyCalculator();
+	}
 
 	@Override
 	public TaikoDifficulty getDifficulty(Mods mods) {
-		return new TaikoDifficultyCalculator().calculate(mods, this);
+		return getDifficultyCalculator().calculate(mods, this);
 	}
 
 	@Override

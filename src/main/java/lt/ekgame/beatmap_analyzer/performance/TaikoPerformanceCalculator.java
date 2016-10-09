@@ -1,35 +1,37 @@
 package lt.ekgame.beatmap_analyzer.performance;
 
 import lt.ekgame.beatmap_analyzer.Gamemode;
+import lt.ekgame.beatmap_analyzer.difficulty.Difficulty;
 import lt.ekgame.beatmap_analyzer.difficulty.TaikoDifficulty;
-import lt.ekgame.beatmap_analyzer.performance.scores.TaikoScore;
+import lt.ekgame.beatmap_analyzer.performance.scores.Score;
 import lt.ekgame.beatmap_analyzer.utils.MathUtils;
 import lt.ekgame.beatmap_analyzer.utils.Mod;
 
-public class TaikoPerformanceCalculator implements PerformanceCalculator<TaikoDifficulty, TaikoScore> {
+public class TaikoPerformanceCalculator implements PerformanceCalculator {
 	
 	@Override
-	public Performance calculate(TaikoDifficulty difficulty, TaikoScore score) {
+	public Performance calculate(Difficulty difficulty, Score score) {
+		TaikoDifficulty diff = (TaikoDifficulty) difficulty;
 		double multiplier = 1.1;
 		
-		if (difficulty.hasMod(Mod.NO_FAIL))
+		if (diff.hasMod(Mod.NO_FAIL))
 			multiplier *= 0.9;
 		
-		if (difficulty.hasMod(Mod.SPUN_OUT))
+		if (diff.hasMod(Mod.SPUN_OUT))
 			multiplier *= 0.95;
 		
-		if (difficulty.hasMod(Mod.HIDDEN))
+		if (diff.hasMod(Mod.HIDDEN))
 			multiplier *= 1.1;
 		
 		double accuracy = score.getAccuracy();
-		double strainValue = calculateStrainValue(difficulty, score);
-		double accValue = calculateAccuracyValue(difficulty, score);
+		double strainValue = calculateStrainValue(diff, score);
+		double accValue = calculateAccuracyValue(diff, score);
 		double performance = Math.pow(Math.pow(strainValue, 1.1) + Math.pow(accValue, 1.1), 1/1.1)*multiplier;
 		
 		return new Performance(accuracy, performance, 0, strainValue, accValue);
 	}
 	
-	private double calculateStrainValue(TaikoDifficulty difficulty, TaikoScore score) {
+	private double calculateStrainValue(TaikoDifficulty difficulty, Score score) {
 		double strainValue = Math.pow(5*Math.max(1, difficulty.getStars()/0.0075) - 4, 2)/100000;
 		double lengthBonus = 1 + 0.1 * Math.min(1, difficulty.getObjectCount() / 1500.0);
 		strainValue *= lengthBonus;
@@ -50,8 +52,7 @@ public class TaikoPerformanceCalculator implements PerformanceCalculator<TaikoDi
 		return strainValue*score.getAccuracy();
 	}
 	
-	private double calculateAccuracyValue(TaikoDifficulty difficulty, TaikoScore score) {
-		System.out.println(difficulty.getMods());
+	private double calculateAccuracyValue(TaikoDifficulty difficulty, Score score) {
 		int perfectHitWindow = MathUtils.getHitWindow300(difficulty.getOD(), Gamemode.TAIKO, difficulty.getMods());
 		if (perfectHitWindow <= 0)
 			return 0;
