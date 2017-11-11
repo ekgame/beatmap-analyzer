@@ -19,7 +19,7 @@ public class ManiaParser extends HitObjectParser<ManiaObject> {
 		int type = Integer.parseInt(args[3].trim());
 		int hitSound = Integer.parseInt(args[4].trim());
 				
-		if ((type & 1) > 0) {
+		if ((type & 7) > 0) {
 			return new ManiaSingle(position, time, hitSound);
 		}
 		else {
